@@ -1,8 +1,9 @@
 import React from 'react'
+import { FullPageLoader } from '@/app/_components/LoadingSpinner'
 
 function loading() {
   return (
-    <div>loading</div>
+    <FullPageLoader text="Loading your financial dashboard..." />
   )
 }
 

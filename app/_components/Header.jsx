@@ -9,8 +9,14 @@ function Header() {
   return (
     <div className="p-5 flex justify-between items-center border shadow-sm">
       <div className="flex flex-row items-center">
-        <Image src={"/chart-donut.svg"} alt="logo" width={40} height={25} />
-        <span className="text-blue-800  font-bold text-xl">CashTrack</span>
+        <Image
+          src="/logo.svg"
+          alt="CashTrack Logo"
+          width={40}
+          height={40}
+          className="mr-3"
+        />
+        <span className="text-blue-800 font-bold text-xl">CashTrack</span>
       </div>
       {isSignedIn ? (
         <div className="flex gap-3  items-center">
@@ -23,11 +29,6 @@ function Header() {
       </div>
       ) : (
         <div className="flex gap-3  items-center">
-          <Link href={"/dashboard"}>
-            <Button variant="outline" className="rounded-full">
-              Dashboard
-            </Button>
-          </Link>
           <Link href={"/sign-in"}>
             <Button className="rounded-full">Get Started</Button>
           </Link>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import {
   LayoutGrid,
@@ -6,14 +6,12 @@ import {
   ReceiptText,
   ShieldCheck,
   CircleDollarSign,
-  TrendingUp,
-  TrendingDownIcon,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 function SideNav() {
-  const menuList = [
+  const menuList = useMemo(() => [
     {
       id: 1,
       name: "Dashboard",
@@ -27,77 +25,57 @@ function SideNav() {
       path: "/dashboard/incomes",
     },
     {
-      id: 2,
+      id: 3,
       name: "Budgets",
       icon: PiggyBank,
       path: "/dashboard/budgets",
     },
     {
-      id: 3,
+      id: 4,
       name: "Expenses",
       icon: ReceiptText,
       path: "/dashboard/expenses",
     },
-    // {
-    //   id: 2,
-    //   name: "Investments",
-    //   icon: TrendingUp,
-    //   path: "/dashboard/investments",
-    // },
-    // {
-    //   id: 2,
-    //   name: "Debts",
-    //   icon: TrendingDownIcon,
-    //   path: "/dashboard/debts",
-    // },
-    {
-      id: 4,
-      name: "Upgrade",
-      icon: ShieldCheck,
-      path: "/dashboard/upgrade",
-    },
-  ];
+  ], []);
+
   const path = usePathname();
 
-  useEffect(() => {
-    console.log(path);
-  }, [path]);
   return (
-    <div className="h-screen p-5 border shadow-sm">
-      {/* <Image src={'/logo.svg'}
-        alt='logo'
-        width={160}
-        height={100}
-        /> */}
-      <div className="flex flex-row items-center">
-        <Image src={"./chart-donut.svg"} alt="logo" width={40} height={25} />
+    <div className="h-screen p-5 border shadow-sm bg-white">
+      <div className="flex flex-row items-center mb-8">
+        <Image
+          src="/logo.svg"
+          alt="CashTrack Logo"
+          width={40}
+          height={40}
+          className="mr-3"
+        />
         <span className="text-blue-800 font-bold text-xl">CashTrack</span>
       </div>
-      <div className="mt-5">
-        {menuList.map((menu, index) => (
-          <Link href={menu.path} key={index}>
-            <h2
-              className={`flex gap-2 items-center
-                    text-gray-500 font-medium
-                    mb-2
-                    p-4 cursor-pointer rounded-full
-                    hover:text-primary hover:bg-blue-100
-                    ${path == menu.path && "text-primary bg-blue-100"}
-                    `}
-            >
-              <menu.icon />
-              {menu.name}
-            </h2>
-          </Link>
-        ))}
-      </div>
-      <div
-        className="fixed bottom-10 p-5 flex gap-2
-            items-center"
-      >
-        <UserButton />
-        Profile
-      </div>
+
+      <nav className="space-y-2">
+        {menuList.map((menu) => {
+          const isActive = path === menu.path;
+          return (
+            <Link href={menu.path} key={menu.id}>
+              <div
+                className={`flex gap-3 items-center
+                  text-gray-500 font-medium
+                  p-4 cursor-pointer rounded-xl
+                  smooth-hover
+                  ${isActive
+                    ? "text-primary bg-blue-100 shadow-sm"
+                    : "hover:text-primary hover:bg-blue-50"
+                  }
+                `}
+              >
+                <menu.icon size={20} />
+                <span>{menu.name}</span>
+              </div>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

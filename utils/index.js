@@ -5,16 +5,24 @@
  */
 
 const formatNumber = (num) => {
-  if (num >= 1e9) {
-    return (num / 1e9).toFixed(1).replace(/\.0Rs./, "") + "Cr";
+  // Handle invalid numbers
+  if (isNaN(num) || num === null || num === undefined) {
+    return "0";
   }
-  if (num >= 1e6) {
-    return (num / 1e6).toFixed(1).replace(/\.0Rs./, "") + "L";
+
+  // Convert to number if it's a string
+  const number = Number(num);
+
+  if (number >= 1e9) {
+    return (number / 1e9).toFixed(1).replace(/\.0$/, "") + "Cr";
   }
-  if (num >= 1e3) {
-    return (num / 1e3).toFixed(1).replace(/\.0Rs./, "") + "K";
+  if (number >= 1e6) {
+    return (number / 1e6).toFixed(1).replace(/\.0$/, "") + "L";
   }
-  return num.toString();
+  if (number >= 1e3) {
+    return (number / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+  }
+  return number.toString();
 };
 
 export default formatNumber;

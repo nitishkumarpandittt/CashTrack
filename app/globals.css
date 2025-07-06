@@ -75,11 +75,10 @@
   }
 }
 
+/* Performance optimized animations */
 .background-animate {
   background-size: 400%;
-
-  -webkit-animation: AnimationName 3s ease infinite;
-  -moz-animation: AnimationName 3s ease infinite;
+  will-change: background-position;
   animation: AnimationName 3s ease infinite;
 }
 
@@ -91,4 +90,73 @@
   50% {
     background-position: 100% 50%;
   }
+}
+
+/* Loading skeleton animation */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Smooth transitions and performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimize scrolling performance */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .background-animate {
+    animation: none;
+  }
+}
+
+/* Performance optimized loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Smooth hover transitions */
+.smooth-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* GPU acceleration for better performance */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
 }

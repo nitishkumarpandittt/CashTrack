@@ -17,10 +17,12 @@ import { db } from "@/utils/dbConfig";
 import { Budgets } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { ButtonLoader } from "@/app/_components/LoadingSpinner";
 
 function CreateBudget({ refreshData }) {
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
@@ -31,19 +33,35 @@ function CreateBudget({ refreshData }) {
    * Used to Create New Budget
    */
   const onCreateBudget = async () => {
-    const result = await db
-      .insert(Budgets)
-      .values({
-        name: name,
-        amount: amount,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
-        icon: emojiIcon,
-      })
-      .returning({ insertedId: Budgets.id });
+    if (!name || !amount) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-    if (result) {
-      refreshData();
-      toast("New Budget Created!");
+    try {
+      setIsLoading(true);
+      const result = await db
+        .insert(Budgets)
+        .values({
+          name: name,
+          amount: amount,
+          createdBy: user?.primaryEmailAddress?.emailAddress,
+          icon: emojiIcon,
+        })
+        .returning({ insertedId: Budgets.id });
+
+      if (result) {
+        refreshData();
+        toast.success("New Budget Created!");
+        setName("");
+        setAmount("");
+        setEmojiIcon("😀");
+      }
+    } catch (error) {
+      console.error("Error creating budget:", error);
+      toast.error("Failed to create budget. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -101,11 +119,18 @@ function CreateBudget({ refreshData }) {
           <DialogFooter className="sm:justify-start">
             <DialogClose asChild>
               <Button
-                disabled={!(name && amount)}
+                disabled={!(name && amount) || isLoading}
                 onClick={() => onCreateBudget()}
                 className="mt-5 w-full rounded-full"
               >
-                Create Budget
+                {isLoading ? (
+                  <span className="flex items-center space-x-2">
+                    <ButtonLoader size="sm" />
+                    <span>Creating Budget...</span>
+                  </span>
+                ) : (
+                  "Create Budget"
+                )}
               </Button>
             </DialogClose>
           </DialogFooter>

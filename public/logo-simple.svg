@@ -1,0 +1,8 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="40" rx="8" fill="#1e40af"/>
+  
+  <!-- Text -->
+  <text x="60" y="16" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">CASH</text>
+  <text x="60" y="30" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#fbbf24" text-anchor="middle">TRACK</text>
+</svg>
