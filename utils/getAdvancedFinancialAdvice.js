@@ -1,5 +1,7 @@
 // utils/getAdvancedFinancialAdvice.js
-// Enhanced AI-powered financial advice using Hugging Face Inference API (Free)
+// Enhanced AI-powered financial advice using Google Gemini API
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const getAdvancedFinancialAdvice = async (totalBudget, totalIncome, totalSpend, budgetList = [], expensesList = []) => {
   console.log("Advanced AI Analysis Inputs:", { totalBudget, totalIncome, totalSpend, budgetList, expensesList });
@@ -15,13 +17,13 @@ const getAdvancedFinancialAdvice = async (totalBudget, totalIncome, totalSpend, 
     // Analyze spending patterns
     const spendingAnalysis = analyzeSpendingPatterns(budgetList, expensesList);
     
-    // Generate contextual advice using Hugging Face API (fallback to local intelligence)
+    // Generate contextual advice using Google Gemini API (fallback to local intelligence)
     let advice = "";
     
     try {
-      // Try Hugging Face API first (if API key is available)
-      if (process.env.NEXT_PUBLIC_HUGGINGFACE_API_KEY) {
-        advice = await getHuggingFaceAdvice(totalBudget, totalIncome, totalSpend, spendingAnalysis);
+      // Try Google Gemini API first (if API key is available)
+      if (process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+        advice = await getGeminiAdvice(totalBudget, totalIncome, totalSpend, spendingAnalysis);
       } else {
         // Use local AI-like intelligence
         advice = generateLocalAdvice(savingsRate, budgetUtilization, surplus, spendingAnalysis);
@@ -127,35 +129,25 @@ const generateLocalAdvice = (savingsRate, budgetUtilization, surplus, spendingAn
   return advice;
 };
 
-// Hugging Face API integration (optional)
-const getHuggingFaceAdvice = async (totalBudget, totalIncome, totalSpend, spendingAnalysis) => {
+// Google Gemini API integration
+const getGeminiAdvice = async (totalBudget, totalIncome, totalSpend, spendingAnalysis) => {
+  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
   const prompt = `As a financial advisor, analyze this data:
 Income: Rs.${totalIncome}, Budget: Rs.${totalBudget}, Spent: Rs.${totalSpend}
 Top spending: ${spendingAnalysis.topSpendingCategories.map(cat => cat.name).join(', ')}
 Provide 2-3 sentences of actionable financial advice.`;
 
-  const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGINGFACE_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      inputs: prompt,
-      parameters: {
-        max_length: 150,
-        temperature: 0.7,
-        do_sample: true
-      }
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error('Hugging Face API request failed');
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    return text;
+  } catch (error) {
+    console.error("Error with Gemini API:", error);
+    throw new Error("Gemini API request failed");
   }
-
-  const result = await response.json();
-  return result[0]?.generated_text || "Unable to generate advice at this time.";
 };
 
 export default getAdvancedFinancialAdvice;
