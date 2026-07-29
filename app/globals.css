@@ -1,0 +1,457 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 177 100% 24%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 168 27% 95%;
+    --secondary-foreground: 177 100% 24%;
+    --muted: 168 27% 95%;
+    --muted-foreground: 204 13% 40%;
+    --accent: 168 27% 95%;
+    --accent-foreground: 177 100% 24%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 160 20% 88%;
+    --input: 160 20% 88%;
+    --ring: 177 100% 24%;
+    --radius: 0.75rem;
+
+    --cash-mist: #f4f8f7;
+    --cash-paper: #ffffff;
+    --cash-wash: #e6f4f2;
+    --cash-teal: #007a74;
+    --cash-emerald: #50c878;
+    --cash-sand: #d2b48c;
+    --cash-glaucous: #6082b6;
+    --cash-ink: #0f1620;
+    --cash-muted: #5c6a72;
+    --cash-line: #d9e6e3;
+    --cash-shadow-nav: 0 12px 36px rgba(15, 22, 32, 0.08);
+    --cash-shadow-card: 0 24px 70px rgba(15, 22, 32, 0.1);
+    --cash-shadow-preview: 0 30px 90px rgba(15, 22, 32, 0.16);
+    --cash-shadow-button: 0 14px 26px rgba(0, 122, 116, 0.24);
+    --font-manrope: "Manrope", sans-serif;
+    --font-source-sans: "Source Sans 3", sans-serif;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide the native page scrollbar — Lenis owns the scroll and the top
+     progress bar shows position. Inner scroll areas keep their scrollbars. */
+  html {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, new Edge */
+  }
+
+  /* Lenis drives scrolling itself; native smooth scrolling fights it. */
+  html.lenis,
+  html.lenis body {
+    scroll-behavior: auto;
+  }
+
+  html.lenis body {
+    overscroll-behavior: none;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-source-sans), sans-serif;
+  }
+
+  button,
+  a,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-manrope), sans-serif;
+  }
+
+  .font-body {
+    font-family: var(--font-source-sans), sans-serif;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.smooth-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ==========================================================================
+   Motion layer
+   Structure and timings follow the reference brief; every colour is mapped
+   onto the existing CashTrack palette so the theme is unchanged.
+   reference --ink   -> --cash-ink     reference --accent -> --cash-teal
+   reference --paper -> --cash-mist    reference --acid   -> --cash-emerald
+   ========================================================================== */
+
+/* Preloader (z-1000) */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: var(--cash-ink);
+}
+
+.preloader__inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.preloader__count {
+  font-variant-numeric: tabular-nums;
+}
+
+.preloader__bar {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: min(320px, 62vw);
+  height: 2px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+.preloader__bar span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--cash-emerald);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* Grain overlay (z-999) — fractalNoise, baseFrequency .8, filter #n */
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.03;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Scroll progress bar — fixed top, 3px */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 995;
+  background: var(--cash-teal);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Cursor label (z-200) — 82px circle, hidden until a [data-cursor] target */
+.cursor-label {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 82px;
+  height: 82px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 0 10px;
+  background: var(--cash-teal);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) scale(0.5);
+  will-change: transform, opacity;
+}
+
+@media (hover: none), (max-width: 900px) {
+  .cursor-label {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Site header
+   Same surface language as the rest of the landing page: white card, a
+   --cash-line hairline, and the --cash-shadow-nav lift. A light backdrop blur
+   keeps content readable as it passes underneath without tinting the page.
+   Colours live in the component so the two states stay unambiguous.
+   ========================================================================== */
+.site-header {
+  transition: background-color 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+/* Nav item hover: the label lifts away while a teal copy rises into its place
+   — the same masked-line gesture the headings use — and a rule wipes in
+   underneath. `position: relative` stays on the element via Tailwind so this
+   block never competes with the positioning utilities. */
+.nav-link__mask {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.nav-link__label {
+  display: block;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link__label--ghost {
+  position: absolute;
+  inset: 0;
+  color: var(--cash-teal);
+  transform: translateY(105%);
+}
+
+.nav-link:hover .nav-link__label,
+.nav-link:focus-visible .nav-link__label {
+  transform: translateY(-105%);
+}
+
+.nav-link:hover .nav-link__label--ghost,
+.nav-link:focus-visible .nav-link__label--ghost {
+  transform: translateY(0);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.875rem;
+  right: 0.875rem;
+  bottom: 0.375rem;
+  height: 1.5px;
+  border-radius: 999px;
+  background: var(--cash-teal);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Drop the travel, keep an unambiguous hover affordance. */
+  .nav-link__label,
+  .nav-link::after {
+    transition: none;
+  }
+
+  .nav-link__label--ghost {
+    display: none;
+  }
+
+  .nav-link:hover .nav-link__label,
+  .nav-link:focus-visible .nav-link__label {
+    transform: none;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--cash-teal);
+  }
+}
+
+/* Line-mask reveal primitives */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  /* Tight leading (0.9-0.98) puts the line-box bottom above where descenders
+     like g/y/p actually reach, so overflow:hidden clips them. Extend the
+     visible box and pull the same amount back with a negative margin, so the
+     clipping stops but the laid-out height is unchanged. */
+  /* Manrope's deepest ink descent is 0.278em (font-box descent 0.306em);
+     the line box itself only clears ~0.11em below the baseline. */
+  padding-bottom: 0.28em;
+  margin-bottom: -0.28em;
+}
+
+.line-mask__inner {
+  display: block;
+  will-change: transform;
+}
+
+/* FAQ accordion — animated from 0 to scrollHeight in JS */
+.faq-panel {
+  height: 0;
+  overflow: hidden;
+  will-change: height;
+}
+
+/* Reveal targets are hidden by GSAP inside a layout effect (before paint)
+   rather than by a global CSS class, so if the motion chunk ever fails to
+   load the content simply stays visible instead of disappearing. */
+
+/* ==========================================================================
+   AI chat panel
+   Entrance and message motion for the assistant dialog. The global
+   prefers-reduced-motion block at the end of this file collapses these
+   animations to a single frame, so no extra handling is needed here.
+   ========================================================================== */
+@keyframes chat-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes chat-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes chat-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-backdrop-in {
+  animation: chat-backdrop-in 0.25s ease-out both;
+}
+
+.chat-panel-in {
+  animation: chat-panel-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Exit mirrors the entrance: a shorter slide-down + fade. The component
+   unmounts the panel on this animation's animationend. */
+@keyframes chat-panel-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+}
+
+.chat-panel-out {
+  animation: chat-panel-out 0.24s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.chat-msg-in {
+  animation: chat-msg-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Hero fluid canvas: mounts a beat after the text intro, so it eases in
+   instead of popping. Target opacity matches the old static opacity-50. */
+@keyframes fluid-in {
+  from { opacity: 0; }
+  to { opacity: 0.5; }
+}
+
+.fluid-in {
+  animation: fluid-in 1.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .noise,
+  .cursor-label,
+  .preloader {
+    display: none !important;
+  }
+}

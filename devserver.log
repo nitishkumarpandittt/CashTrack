@@ -1,0 +1,88 @@
+
+> ai-expense-advisor@0.1.0 dev
+> next dev --turbo --port 3000
+
+  ▲ Next.js 14.2.22 (turbo)
+  - Local:        http://localhost:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ⚠ Disabling SWC Minifer will not be an option in the next major version. Please report any issues you may be experiencing to https://github.com/vercel/next.js/issues
+ ✓ Compiled in 394ms
+ ✓ Ready in 1305ms
+ ✓ Compiled middleware in 46ms
+ ✓ Compiled in 133ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s
+ GET / 200 in 3247ms
+ GET / 200 in 130ms
+ ✓ Compiled /sign-in/[[...sign-in]] in 318ms
+ GET /sign-in 200 in 755ms
+INFO: Clerk: The request to /dashboard is being redirected because there is no signed-in user, and the path is not included in `ignoredRoutes` or `publicRoutes`. To prevent this behavior, choose one of:
+
+1. To make the route accessible to both signed in and signed out users, add "/dashboard" to the `publicRoutes` array passed to authMiddleware
+2. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/dashboard"]` to authMiddleware
+3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+INFO: Clerk: The request to /dashboard/incomes is being redirected because there is no signed-in user, and the path is not included in `ignoredRoutes` or `publicRoutes`. To prevent this behavior, choose one of:
+
+1. To make the route accessible to both signed in and signed out users, add "/dashboard/incomes" to the `publicRoutes` array passed to authMiddleware
+2. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/dashboard/incomes"]` to authMiddleware
+3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+INFO: Clerk: The request to /api/chat is being protected (401) because there is no signed-in user, and the path is included in `apiRoutes`. To prevent this behavior, choose one of:
+
+1. To prevent Clerk authentication from protecting (401) the api route, remove the rule matching "/api/chat" from the `apiRoutes` array passed to authMiddleware
+2. To make the route accessible to both signed in and signed out users, add "/api/chat" to the `publicRoutes` array passed to authMiddleware
+3. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/api/chat"]` to authMiddleware
+4. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+ GET / 200 in 174ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 700ms
+ GET /favicon.ico 500 in 1078ms
+INFO: Clerk: The request to /__nextjs_original-stack-frame is being redirected because there is no signed-in user, and the path is not included in `ignoredRoutes` or `publicRoutes`. To prevent this behavior, choose one of:
+
+1. To make the route accessible to both signed in and signed out users, add "/__nextjs_original-stack-frame" to the `publicRoutes` array passed to authMiddleware
+2. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/__nextjs_original-stack-frame"]` to authMiddleware
+3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+INFO: Clerk: The request to /__nextjs_original-stack-frame is being redirected because there is no signed-in user, and the path is not included in `ignoredRoutes` or `publicRoutes`. To prevent this behavior, choose one of:
+
+1. To make the route accessible to both signed in and signed out users, add "/__nextjs_original-stack-frame" to the `publicRoutes` array passed to authMiddleware
+2. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/__nextjs_original-stack-frame"]` to authMiddleware
+3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+INFO: Clerk: The request to /__nextjs_original-stack-frame is being redirected because there is no signed-in user, and the path is not included in `ignoredRoutes` or `publicRoutes`. To prevent this behavior, choose one of:
+
+1. To make the route accessible to both signed in and signed out users, add "/__nextjs_original-stack-frame" to the `publicRoutes` array passed to authMiddleware
+2. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/__nextjs_original-stack-frame"]` to authMiddleware
+3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+INFO: Clerk: The request to /__nextjs_original-stack-frame is being redirected because there is no signed-in user, and the path is not included in `ignoredRoutes` or `publicRoutes`. To prevent this behavior, choose one of:
+
+1. To make the route accessible to both signed in and signed out users, add "/__nextjs_original-stack-frame" to the `publicRoutes` array passed to authMiddleware
+2. To prevent Clerk authentication from running at all, pass `ignoredRoutes: ["/((?!api|trpc))(_next.*|.+\.[\w]+$)", "/__nextjs_original-stack-frame"]` to authMiddleware
+3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if `debug: true` is passed to authMiddleware)
+ GET /favicon.ico 500 in 52ms
+ GET / 200 in 273ms
+ GET /favicon.ico 500 in 3047ms
+ GET / 200 in 289ms
+ GET /favicon.ico 500 in 85ms
+ GET /favicon.ico 500 in 96ms
+[?25h
