@@ -100,8 +100,8 @@ function Hero() {
       <section id="hero" className="relative isolate px-4 pb-24 pt-36 sm:px-6 sm:pb-32 sm:pt-">
         {/* Fluid field sits behind the grid so the grid still reads over it. */}
         <HeroFluidBackground />
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(rgba(15,22,32,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(15,22,32,0.035)_1px,transparent_1px)] [background-size:42px_42px] [mask-image:linear-gradient(to_bottom,black,transparent_75%)]" aria-hidden="true" />
-        <div className="pointer-events-none absolute right-[8%] top-40 -z-10 h-40 w-40 rounded-full border border-[var(--cash-line)] bg-[var(--cash-wash)]/60 blur-[1px]" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(var(--cash-grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--cash-grid-line)_1px,transparent_1px)] [background-size:42px_42px] [mask-image:linear-gradient(to_bottom,black,transparent_75%)]" aria-hidden="true" />
+        <div className="pointer-events-none absolute right-[8%] top-40 -z-10 h-40 w-40 rounded-full border border-[var(--cash-line)] bg-[rgb(var(--cash-wash-rgb)/0.6)] blur-[1px]" aria-hidden="true" />
 
         <div className="mx-auto max-w-[1240px]">
           <div className="grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
@@ -121,7 +121,7 @@ function Hero() {
                       Live with{" "}
                       <span className="relative inline-block">
                         <span className="relative z-10">momentum.</span>
-                        <span className="absolute -bottom-1 left-0 right-0 -z-0 h-3 rounded-full bg-[var(--cash-sand)]/70 sm:h-4" aria-hidden="true" />
+                        <span className="absolute -bottom-1 left-0 right-0 -z-0 h-3 rounded-full bg-[rgb(var(--cash-sand-rgb)/0.7)] sm:h-4" aria-hidden="true" />
                       </span>
                     </span>
                   </span>
@@ -136,7 +136,7 @@ function Hero() {
 
               <Reveal delay={0.45} immediate>
                 <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                  <Button asChild size="lg" className="h-14 rounded-full bg-[var(--cash-teal)] px-7 text-base text-white shadow-[var(--cash-shadow-button)] hover:-translate-y-0.5 hover:bg-[var(--cash-ink)]">
+                  <Button asChild size="lg" className="h-14 rounded-full bg-[var(--cash-teal-solid)] px-7 text-base text-white shadow-[var(--cash-shadow-button)] hover:-translate-y-0.5 hover:bg-[var(--cash-onyx)]">
                     <Link href="/dashboard" data-cursor="Start">
                       Start tracking free
                       <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -171,7 +171,7 @@ function Hero() {
         </div>
       </section>
 
-      <section className="border-y border-[var(--cash-line)] bg-white/55 px-4 py-9 sm:px-6">
+      <section className="border-y border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.55)] px-4 py-9 sm:px-6">
         {/* 2x2 on mobile/tablet, one row on md+. Dividers and edge padding are
             set per cell — a plain divide-x puts a stray border and indent on
             the second mobile row. */}
@@ -214,14 +214,14 @@ function Hero() {
 
           <div className="mt-14 grid gap-4 md:grid-cols-12 md:grid-rows-2">
             <Reveal className="md:col-span-5 md:row-span-2" delay={0.05}>
-              <article className="group relative flex h-full min-h-[430px] flex-col justify-between overflow-hidden rounded-[28px] bg-[var(--cash-teal)] p-7 text-white shadow-[var(--cash-shadow-card)] transition-transform duration-500 hover:-translate-y-1 sm:p-9">
+              <article className="group relative flex h-full min-h-[430px] flex-col justify-between overflow-hidden rounded-[28px] bg-[var(--cash-teal-solid)] p-7 text-white shadow-[var(--cash-shadow-card)] transition-transform duration-500 hover:-translate-y-1 sm:p-9">
                 <div className="relative z-10 flex items-center justify-between">
                   <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em]">Core signal</span>
                   <Sparkles className="h-5 w-5 text-[var(--cash-sand)]" aria-hidden="true" />
                 </div>
                 <div className="relative z-10">
                   <h3 className="max-w-[370px] font-display text-4xl font-bold leading-[0.98] tracking-[-0.07em] sm:text-5xl">Know what your money is trying to tell you.</h3>
-                  <p className="mt-5 max-w-[350px] text-sm leading-6 text-white/75">AI-powered summaries turn messy activity into a simple, useful next move.</p>
+                  <p className="mt-5 max-w-[350px] text-sm leading-6 text-white/90">AI-powered summaries turn messy activity into a simple, useful next move.</p>
                   <a href="#how-it-works" className="mt-8 inline-flex items-center text-sm font-bold text-white transition-colors hover:text-[var(--cash-sand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
                     Explore the rhythm <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                   </a>
@@ -231,7 +231,7 @@ function Hero() {
             </Reveal>
 
             <Reveal className="md:col-span-7" delay={0.1}>
-              <article className="flex h-full min-h-[205px] items-end justify-between gap-6 rounded-[28px] border border-[var(--cash-line)] bg-white p-7 shadow-[var(--cash-shadow-card)] transition-transform duration-500 hover:-translate-y-1 sm:p-9">
+              <article className="flex h-full min-h-[205px] items-end justify-between gap-6 rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-7 shadow-[var(--cash-shadow-card)] transition-transform duration-500 hover:-translate-y-1 sm:p-9">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cash-teal)]">Less admin</p>
                   <h3 className="mt-4 max-w-[420px] font-display text-3xl font-bold leading-tight tracking-[-0.06em]">Budgets that flex with the month.</h3>
@@ -242,7 +242,7 @@ function Hero() {
             </Reveal>
 
             <Reveal className="md:col-span-7" delay={0.15}>
-              <article className="flex h-full min-h-[205px] items-end justify-between gap-6 rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-ink)] p-7 text-white shadow-[var(--cash-shadow-card)] transition-transform duration-500 hover:-translate-y-1 sm:p-9">
+              <article className="flex h-full min-h-[205px] items-end justify-between gap-6 rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-onyx)] p-7 text-white shadow-[var(--cash-shadow-card)] transition-transform duration-500 hover:-translate-y-1 sm:p-9">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cash-emerald)]">Quiet confidence</p>
                   <h3 className="mt-4 max-w-[420px] font-display text-3xl font-bold leading-tight tracking-[-0.06em]">Your private financial cockpit.</h3>
@@ -255,7 +255,7 @@ function Hero() {
         </div>
       </section>
 
-      <section id="how-it-works" className="border-y border-[var(--cash-line)] bg-white px-4 py-24 sm:px-6 sm:py-32">
+      <section id="how-it-works" className="border-y border-[var(--cash-line)] bg-[var(--cash-paper)] px-4 py-24 sm:px-6 sm:py-32">
         <div className="mx-auto max-w-[1240px]">
           <Reveal>
             <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -277,7 +277,7 @@ function Hero() {
                 right, where columnWidth = (100% - 2*32px) / 3. The previous
                 10%/10% inset was unrelated to the circles and overshot by 244px. */}
             <div
-              className="pointer-events-none absolute left-6 right-[calc((100%_-_64px)/3_-_24px)] top-6 hidden border-t border-dashed border-[var(--cash-glaucous)]/40 md:block"
+              className="pointer-events-none absolute left-6 right-[calc((100%_-_64px)/3_-_24px)] top-6 hidden border-t border-dashed border-[rgb(var(--cash-glaucous-rgb)/0.4)] md:block"
               aria-hidden="true"
             />
             {steps.map((step, index) => (
@@ -285,7 +285,7 @@ function Hero() {
                 {/* Stacked below md, so each step centers; the 3-column row
                     from md up stays left-aligned under the connector line. */}
                 <article className="relative flex flex-col items-center text-center md:items-start md:text-left">
-                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[var(--cash-teal)] bg-white font-display text-sm font-extrabold text-[var(--cash-teal)] shadow-sm">{step.number}</div>
+                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[var(--cash-teal)] bg-[var(--cash-paper)] font-display text-sm font-extrabold text-[var(--cash-teal)] shadow-sm">{step.number}</div>
                   <h3 className="mt-7 max-w-[260px] font-display text-2xl font-bold leading-tight tracking-[-0.06em]">{step.title}</h3>
                   <p className="mt-3 max-w-[310px] text-sm leading-6 text-[var(--cash-muted)]">{step.description}</p>
                 </article>
@@ -313,8 +313,8 @@ function Hero() {
       </section>
 
       <section className="px-4 pb-6 sm:px-6 sm:pb-8">
-        <div className="relative mx-auto max-w-[1240px] overflow-hidden rounded-[32px] bg-[var(--cash-ink)] px-6 py-16 text-center text-white sm:px-10 sm:py-24">
-          <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border-[42px] border-[var(--cash-teal)]/25" aria-hidden="true" />
+        <div className="relative mx-auto max-w-[1240px] overflow-hidden rounded-[32px] bg-[var(--cash-onyx)] px-6 py-16 text-center text-white sm:px-10 sm:py-24">
+          <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border-[42px] border-[rgb(var(--cash-teal-rgb)/0.25)]" aria-hidden="true" />
           <Reveal>
             <div className="relative z-10 mx-auto max-w-[700px]">
               <LineMask
@@ -322,7 +322,7 @@ function Hero() {
                 text="Make your next money move a good one."
               />
               <p className="mx-auto mt-6 max-w-[520px] text-base leading-7 text-white/60 sm:text-lg">Set up your financial home today and let the small, smart decisions compound.</p>
-              <Button asChild size="lg" className="mt-9 h-14 rounded-full bg-[var(--cash-emerald)] px-7 text-base font-bold text-[var(--cash-ink)] shadow-[var(--cash-shadow-button)] hover:bg-white">
+              <Button asChild size="lg" className="mt-9 h-14 rounded-full bg-[var(--cash-emerald)] px-7 text-base font-bold text-[var(--cash-onyx)] shadow-[var(--cash-shadow-button)] hover:bg-white">
                 <Link href="/dashboard" data-cursor="Open"><span>Open CashTrack</span> <ArrowUpRight className="ml-2 h-4 w-4" aria-hidden="true" /></Link>
               </Button>
             </div>

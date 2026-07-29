@@ -25,17 +25,61 @@
     --ring: 177 100% 24%;
     --radius: 0.75rem;
 
+    color-scheme: light;
+
+    /* Surfaces, from recessed to raised: mist (page) → paper (card).
+       --cash-wash is the teal-tinted fill used for active/selected states. */
     --cash-mist: #f4f8f7;
     --cash-paper: #ffffff;
     --cash-wash: #e6f4f2;
+
+    /* Brand accent. --cash-teal is the *ink* role (labels, borders, rings);
+       --cash-teal-solid is the *fill* role, i.e. surfaces carrying white text.
+       They are the same colour in light mode and diverge in dark, where an
+       accent legible on a dark page is too light to sit under white text. */
     --cash-teal: #007a74;
+    --cash-teal-solid: #007a74;
+
     --cash-emerald: #50c878;
     --cash-sand: #d2b48c;
     --cash-glaucous: #6082b6;
+
+    /* Foreground text. Flips to near-white in dark mode. */
     --cash-ink: #0f1620;
     --cash-muted: #5c6a72;
     --cash-line: #d9e6e3;
+
+    /* Inverted surfaces that stay dark in *both* themes — the auth panel, the
+       closing CTA band, modal scrims — plus text that sits on a bright accent.
+       Everything layered on these keeps its literal `text-white`. */
+    --cash-onyx: #0f1620;
+
+    /* The small pill that must always oppose the page (the header's Dashboard
+       button): dark-on-light in light mode, light-on-dark in dark mode. */
+    --cash-contrast: #0f1620;
+    --cash-contrast-fg: #ffffff;
+
+    --cash-skeleton-from: #f0f0f0;
+    --cash-skeleton-via: #e0e0e0;
+
+    --cash-grid-line: rgba(15, 22, 32, 0.035);
+
+    /* Channel-only copies of the tokens that are used at partial opacity.
+       Tailwind cannot apply an opacity modifier to a bare var() colour — it
+       drops the declaration entirely — so anything translucent has to be
+       written as rgb(var(--…-rgb)/<alpha>) instead of bg-[var(--…)]/90. */
+    --cash-paper-rgb: 255 255 255;
+    --cash-mist-rgb: 244 248 247;
+    --cash-wash-rgb: 230 244 242;
+    --cash-teal-rgb: 0 122 116;
+    --cash-teal-solid-rgb: 0 122 116;
+    --cash-onyx-rgb: 15 22 32;
+    --cash-ink-rgb: 15 22 32;
+    --cash-sand-rgb: 210 180 140;
+    --cash-glaucous-rgb: 96 130 182;
+
     --cash-shadow-nav: 0 12px 36px rgba(15, 22, 32, 0.08);
+    --cash-shadow-nav-strong: 0 16px 40px rgba(15, 22, 32, 0.12);
     --cash-shadow-card: 0 24px 70px rgba(15, 22, 32, 0.1);
     --cash-shadow-preview: 0 30px 90px rgba(15, 22, 32, 0.16);
     --cash-shadow-button: 0 14px 26px rgba(0, 122, 116, 0.24);
@@ -44,29 +88,91 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    color-scheme: dark;
+
+    /* These mirror the --cash-* values exactly, so `bg-background` (used by
+       the shared Button/Input primitives) lands on the same colour as the
+       page and `bg-card` on the same colour as every card. */
+    --background: 202 33% 6.5%;
+    --foreground: 200 32% 92.5%;
+    --card: 202 29% 10%;
+    --card-foreground: 200 32% 92.5%;
+    --popover: 202 29% 10%;
+    --popover-foreground: 200 32% 92.5%;
+    --primary: 174 55% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 176 41% 13%;
+    --secondary-foreground: 174 55% 47%;
+    --muted: 176 41% 13%;
+    --muted-foreground: 200 15% 63%;
+    --accent: 176 41% 13%;
+    --accent-foreground: 174 55% 47%;
+    --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 200 24% 17%;
+    --input: 200 24% 17%;
+    --ring: 174 55% 47%;
+
+    /* Same ladder as light mode, inverted: the page is the deepest surface and
+       cards sit a step above it, so every existing `mist under paper` pairing
+       keeps its meaning without touching the components. */
+    --cash-mist: #0b1216;
+    --cash-paper: #121b21;
+    --cash-wash: #14312f;
+
+    --cash-teal: #35bdb0;
+    /* Deep enough that white body text on it clears 4.5:1, light enough to
+       stay clearly separated from the page behind it. */
+    --cash-teal-solid: #07766f;
+
+    --cash-emerald: #57d083;
+    --cash-sand: #d9c09c;
+    --cash-glaucous: #8aa8d6;
+
+    --cash-ink: #e6eef2;
+    --cash-muted: #93a3ad;
+    --cash-line: #223038;
+
+    --cash-onyx: #060b0e;
+
+    --cash-contrast: #eef4f7;
+    --cash-contrast-fg: #0f1620;
+
+    --cash-skeleton-from: #16212a;
+    --cash-skeleton-via: #1e2c36;
+
+    --cash-grid-line: rgba(230, 238, 242, 0.05);
+
+    --cash-paper-rgb: 18 27 33;
+    --cash-mist-rgb: 11 18 22;
+    --cash-wash-rgb: 20 49 47;
+    --cash-teal-rgb: 53 189 176;
+    --cash-teal-solid-rgb: 7 118 111;
+    --cash-onyx-rgb: 6 11 14;
+    --cash-ink-rgb: 230 238 242;
+    --cash-sand-rgb: 217 192 156;
+    --cash-glaucous-rgb: 138 168 214;
+
+    /* Ambient shadows read as nothing against a dark page, so they go darker
+       and deeper to keep cards separated from the background. */
+    --cash-shadow-nav: 0 12px 36px rgba(0, 0, 0, 0.55);
+    --cash-shadow-nav-strong: 0 16px 40px rgba(0, 0, 0, 0.7);
+    --cash-shadow-card: 0 24px 70px rgba(0, 0, 0, 0.5);
+    --cash-shadow-preview: 0 30px 90px rgba(0, 0, 0, 0.6);
+    --cash-shadow-button: 0 14px 26px rgba(0, 0, 0, 0.45);
   }
 
   * {
     @apply border-border;
+  }
+
+  /* Tailwind hard-codes the focus-ring gap to white, which reads as a bright
+     halo on a dark page. Transparent lets whatever sits behind the control
+     show through, so the gap is right on every surface. */
+  .dark *,
+  .dark ::before,
+  .dark ::after {
+    --tw-ring-offset-color: transparent;
   }
 
   html {
@@ -129,7 +235,12 @@
 }
 
 .loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--cash-skeleton-from) 25%,
+    var(--cash-skeleton-via) 50%,
+    var(--cash-skeleton-from) 75%
+  );
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
@@ -163,7 +274,9 @@
   z-index: 1000;
   display: grid;
   place-items: center;
-  background: var(--cash-ink);
+  /* Onyx, not ink: the overlay carries white text, so it has to stay dark in
+     both themes rather than following the foreground flip. */
+  background: var(--cash-onyx);
 }
 
 .preloader__inner {
@@ -207,6 +320,13 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* `multiply` darkens toward black, which is invisible on a dark page — the
+   grain has to lighten instead to stay perceptible. */
+.dark .noise {
+  mix-blend-mode: screen;
+  opacity: 0.04;
+}
+
 /* Scroll progress bar — fixed top, 3px */
 .scroll-progress {
   position: fixed;
@@ -235,7 +355,8 @@
   place-items: center;
   text-align: center;
   padding: 0 10px;
-  background: var(--cash-teal);
+  /* Carries white text, so it takes the solid teal role. */
+  background: var(--cash-teal-solid);
   color: #fff;
   font-size: 10px;
   font-weight: 800;

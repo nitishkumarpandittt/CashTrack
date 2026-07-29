@@ -12,7 +12,7 @@ const DashboardHeader = lazy(() => import("./_components/DashboardHeader"));
 const MobileNav = lazy(() => import("./_components/MobileNav"));
 
 const SideNavSkeleton = () => (
-  <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[var(--cash-line)] bg-white/90 backdrop-blur md:block">
+  <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.9)] backdrop-blur md:block">
     <div className="flex h-full min-h-screen flex-col p-5">
       <div className="flex items-center gap-3 border-b border-[var(--cash-line)] pb-6">
         <div className="h-10 w-10 animate-pulse rounded-2xl bg-[var(--cash-wash)]" />
@@ -38,7 +38,7 @@ const SideNavSkeleton = () => (
 );
 
 const HeaderSkeleton = () => (
-  <div className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[var(--cash-line)] bg-white/80 px-4 backdrop-blur md:px-8">
+  <div className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.8)] px-4 backdrop-blur md:px-8">
     <div className="flex items-center gap-3">
       <div className="h-9 w-9 animate-pulse rounded-full bg-[var(--cash-wash)] md:hidden" />
       <div className="space-y-2">

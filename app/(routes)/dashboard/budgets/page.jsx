@@ -18,7 +18,7 @@ function Budget() {
             Give every priority a clear limit, then let CashTrack show you what is left.
           </p>
         </div>
-        <div className="hidden items-center gap-2 rounded-full border border-[var(--cash-line)] bg-white px-4 py-2.5 text-xs font-bold text-[var(--cash-muted)] shadow-sm md:flex">
+        <div className="hidden items-center gap-2 rounded-full border border-[var(--cash-line)] bg-[var(--cash-paper)] px-4 py-2.5 text-xs font-bold text-[var(--cash-muted)] shadow-sm md:flex">
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--cash-emerald)]" aria-hidden="true" />
           Add a budget to get started
           <ArrowUpRight className="h-3.5 w-3.5 text-[var(--cash-teal)]" aria-hidden="true" />

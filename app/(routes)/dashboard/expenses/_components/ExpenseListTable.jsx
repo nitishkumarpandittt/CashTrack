@@ -19,7 +19,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
   };
 
   return (
-    <section className="mt-6 rounded-[28px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] md:p-7">
+    <section className="mt-6 rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] md:p-7">
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cash-teal)]">
@@ -46,7 +46,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
           </thead>
           <tbody className="divide-y divide-[var(--cash-line)]">
             {expensesList.map((expense) => (
-              <tr key={expense.id} className="group transition-colors hover:bg-[var(--cash-mist)]/70">
+              <tr key={expense.id} className="group transition-colors hover:bg-[rgb(var(--cash-mist-rgb)/0.7)]">
                 <td className="truncate px-4 py-4 text-sm font-semibold text-[var(--cash-ink)]">{expense.name}</td>
                 <td className="px-4 py-4 font-display text-sm font-bold text-[var(--cash-ink)]">Rs.{expense.amount}</td>
                 <td className="px-4 py-4 text-sm text-[var(--cash-muted)]">{expense.createdAt}</td>
@@ -55,7 +55,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
                     type="button"
                     onClick={() => deleteExpense(expense)}
                     aria-label={`Delete ${expense.name}`}
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-rose-500 opacity-70 transition-colors hover:bg-rose-50 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-rose-500 dark:text-rose-400 opacity-70 transition-colors hover:bg-rose-50 dark:hover:bg-rose-400/10 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     Delete
@@ -69,7 +69,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
 
       <div className="mt-6 space-y-3 md:hidden">
         {expensesList.map((expense) => (
-          <article key={expense.id} className="rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)]/55 p-4">
+          <article key={expense.id} className="rounded-2xl border border-[var(--cash-line)] bg-[rgb(var(--cash-mist-rgb)/0.55)] p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className="truncate font-semibold text-[var(--cash-ink)]">{expense.name}</h3>
@@ -80,7 +80,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
             <button
               type="button"
               onClick={() => deleteExpense(expense)}
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 dark:text-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               Delete expense
@@ -90,7 +90,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
       </div>
 
       {expensesList.length === 0 && (
-        <div className="mt-6 rounded-2xl border border-dashed border-[var(--cash-line)] bg-[var(--cash-mist)]/50 px-5 py-10 text-center">
+        <div className="mt-6 rounded-2xl border border-dashed border-[var(--cash-line)] bg-[rgb(var(--cash-mist-rgb)/0.5)] px-5 py-10 text-center">
           <p className="font-display text-base font-bold text-[var(--cash-ink)]">No expenses yet</p>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[var(--cash-muted)]">
             Start by adding an expense to see your spending rhythm here.

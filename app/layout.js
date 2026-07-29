@@ -1,6 +1,7 @@
 import { Manrope, Source_Sans_3 } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
+import ThemeProvider, { themeInitScript } from "@/app/_components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -28,14 +29,24 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <html lang="en">
+      {/* suppressHydrationWarning: the theme script below rewrites <html>'s
+          class list before React hydrates, and browser extensions routinely
+          add their own attributes to <body> (bis_register, cz-shortcut-listen
+          and friends). Both are expected client-only attribute differences. */}
+      <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/cashtrack-icon-theme.svg" />
+          <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         </head>
-        <body className={`${manrope.variable} ${sourceSans.variable} antialiased`}>
-          <Toaster />
-          {children}
+        <body
+          className={`${manrope.variable} ${sourceSans.variable} antialiased`}
+          suppressHydrationWarning
+        >
+          <ThemeProvider>
+            <Toaster />
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

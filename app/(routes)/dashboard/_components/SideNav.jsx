@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import {
   CircleDollarSign,
+  Home,
   LayoutGrid,
   PiggyBank,
   ReceiptText,
@@ -14,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { userButtonElements } from "@/app/_components/theme/clerkAppearance";
 import AiChat from "./AiChat";
 
 function SideNav() {
@@ -22,20 +24,25 @@ function SideNav() {
   const [chatOpen, setChatOpen] = useState(false);
   const menuList = useMemo(
     () => [
-      { id: 1, name: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
-      { id: 2, name: "Incomes", icon: CircleDollarSign, path: "/dashboard/incomes" },
-      { id: 3, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
-      { id: 4, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
-      { id: 5, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
+      { id: 1, name: "Home", icon: Home, path: "/" },
+      { id: 2, name: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
+      { id: 3, name: "Incomes", icon: CircleDollarSign, path: "/dashboard/incomes" },
+      { id: 4, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
+      { id: 5, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
+      { id: 6, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
     ],
     []
   );
 
+  // "/" and "/dashboard" are prefixes of every other route, so they only count
+  // as active on an exact match.
   const isActivePath = (menuPath) =>
-    menuPath === "/dashboard" ? path === menuPath : path.startsWith(menuPath);
+    menuPath === "/dashboard" || menuPath === "/"
+      ? path === menuPath
+      : path.startsWith(menuPath);
 
   return (
-    <div className="flex min-h-screen flex-col border-r border-[var(--cash-line)] bg-white/90 px-5 py-6 shadow-[var(--cash-shadow-nav)] backdrop-blur">
+    <div className="flex min-h-screen flex-col border-r border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.9)] px-5 py-6 shadow-[var(--cash-shadow-nav)] backdrop-blur">
       <Link
         href="/"
         className="flex items-center gap-3 border-b border-[var(--cash-line)] pb-6"
@@ -100,7 +107,7 @@ function SideNav() {
         <button
           type="button"
           onClick={() => setChatOpen(true)}
-          className="group w-full rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)] p-4 text-left transition-colors hover:border-[var(--cash-teal)]/40 hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)]"
+          className="group w-full rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)] p-4 text-left transition-colors hover:border-[rgb(var(--cash-teal-rgb)/0.4)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)]"
         >
           <span className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-[var(--cash-teal)]" aria-hidden="true" />
@@ -119,7 +126,7 @@ function SideNav() {
       <div className="mt-5 flex items-center gap-3 border-t border-[var(--cash-line)] pt-5">
         <UserButton
           afterSignOutUrl="/"
-          appearance={{ elements: { avatarBox: "h-9 w-9" } }}
+          appearance={{ elements: { ...userButtonElements, avatarBox: "h-9 w-9" } }}
         />
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--cash-muted)]">

@@ -42,7 +42,7 @@ function AddExpense({ budgetId, user, refreshData }) {
   };
 
   return (
-    <section className="rounded-[24px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] md:p-6">
+    <section className="rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] md:p-6">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cash-wash)] text-[var(--cash-teal)]">
           <Plus className="h-5 w-5" aria-hidden="true" />
@@ -81,7 +81,7 @@ function AddExpense({ budgetId, user, refreshData }) {
       <Button
         disabled={!(name && amount) || loading}
         onClick={addNewExpense}
-        className="mt-6 h-12 w-full rounded-full bg-[var(--cash-teal)] text-white hover:bg-[var(--cash-ink)]"
+        className="mt-6 h-12 w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)]"
       >
         {loading ? <Loader className="h-4 w-4 animate-spin" aria-label="Adding expense" /> : "Add new expense"}
       </Button>

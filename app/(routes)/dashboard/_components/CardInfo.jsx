@@ -33,13 +33,13 @@ const healthStyles = {
     label: "Fair",
     icon: AlertCircle,
     iconClass: "text-[var(--cash-sand)]",
-    badgeClass: "bg-amber-50 text-amber-700",
+    badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300",
   },
   poor: {
     label: "Needs attention",
     icon: TrendingDown,
-    iconClass: "text-rose-500",
-    badgeClass: "bg-rose-50 text-rose-700",
+    iconClass: "text-rose-500 dark:text-rose-400",
+    badgeClass: "bg-rose-50 text-rose-700 dark:bg-rose-400/10 dark:text-rose-300",
   },
   neutral: {
     label: "Building your picture",
@@ -51,17 +51,17 @@ const healthStyles = {
 
 const toneStyles = {
   critical: {
-    wrap: "border-rose-100 bg-rose-50/60",
+    wrap: "border-rose-100 bg-rose-50/60 dark:border-rose-400/25 dark:bg-rose-400/10",
     icon: AlertCircle,
-    icon_: "text-rose-500",
+    icon_: "text-rose-500 dark:text-rose-400",
   },
   warn: {
-    wrap: "border-amber-100 bg-amber-50/60",
+    wrap: "border-amber-100 bg-amber-50/60 dark:border-amber-400/25 dark:bg-amber-400/10",
     icon: TrendingDown,
-    icon_: "text-amber-600",
+    icon_: "text-amber-600 dark:text-amber-300",
   },
   good: {
-    wrap: "border-[var(--cash-line)] bg-[var(--cash-wash)]/70",
+    wrap: "border-[var(--cash-line)] bg-[rgb(var(--cash-wash-rgb)/0.7)]",
     icon: CheckCircle,
     icon_: "text-[var(--cash-teal)]",
   },
@@ -164,13 +164,13 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
     <div>
       {budgetList?.length > 0 ? (
         <div>
-          <section className="relative overflow-hidden rounded-[28px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] md:p-7">
+          <section className="relative overflow-hidden rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] md:p-7">
             <div className="absolute inset-y-0 left-0 w-1.5 bg-[var(--cash-teal)]" aria-hidden="true" />
             <div className="relative">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
                 <div>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cash-ink)] text-[var(--cash-emerald)]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--cash-onyx)] text-[var(--cash-emerald)]">
                       <Sparkles className="h-5 w-5" aria-hidden="true" />
                     </div>
                     <div>
@@ -267,13 +267,13 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
               label="Total spend"
               value={<Counter value={totalSpend} playOnMount format={(n) => `Rs.${formatNumber(n)}`} />}
               icon={ReceiptText}
-              iconClass="bg-rose-50 text-rose-500"
+              iconClass="bg-rose-50 text-rose-500 dark:bg-rose-400/10 dark:text-rose-400"
             />
             <MetricCard
               label="Active budgets"
               value={<Counter value={budgetList.length} playOnMount />}
               icon={Wallet}
-              iconClass="bg-emerald-50 text-emerald-600"
+              iconClass="bg-emerald-50 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300"
             />
           </div>
         </div>
@@ -282,7 +282,7 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
         // account fell through to this branch and skeletons pulsed forever.
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-28 animate-pulse rounded-[24px] border border-[var(--cash-line)] bg-white" />
+            <div key={item} className="h-28 animate-pulse rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)]" />
           ))}
         </div>
       ) : (
@@ -300,7 +300,7 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
 
 function MetricCard({ label, value, icon: Icon, iconClass }) {
   return (
-    <article className="flex items-center justify-between rounded-[24px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] transition-transform duration-300 hover:-translate-y-0.5">
+    <article className="flex items-center justify-between rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] transition-transform duration-300 hover:-translate-y-0.5">
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--cash-muted)]">{label}</p>
         <p className="mt-2 font-display text-2xl font-extrabold tracking-[-0.07em] text-[var(--cash-ink)]">{value}</p>

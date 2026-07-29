@@ -7,6 +7,8 @@ import { useUser, UserButton } from "@clerk/nextjs";
 import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { userButtonElements } from "./theme/clerkAppearance";
+import ThemeToggle from "./theme/ThemeToggle";
 import { getLenis } from "./motion/lenis-instance";
 
 const navItems = [
@@ -55,14 +57,15 @@ function Header() {
   // One colour class at a time, so the cascade is unambiguous.
   const linkColor = scrolled ? "text-[var(--cash-ink)]" : "text-[var(--cash-muted)]";
 
-  // The nav is opaque white on both states, so the page never bleeds through
-  // it — the surface just firms up and lifts a little once you scroll.
+  // The nav is the opaque card surface in both states, so the page never
+  // bleeds through it — the surface just firms up and lifts a little once you
+  // scroll.
   // The `shadow:` type hint is required: given a bare var(), Tailwind guesses
   // the arbitrary value is a shadow *colour* and emits --tw-shadow-color, which
   // leaves --tw-shadow undefined and the box-shadow resolving to `none`.
   const surface = scrolled
-    ? "bg-white shadow-[0_16px_40px_rgba(15,22,32,0.12)]"
-    : "bg-white/90 shadow-[shadow:var(--cash-shadow-nav)]";
+    ? "bg-[var(--cash-paper)] shadow-[shadow:var(--cash-shadow-nav-strong)]"
+    : "bg-[rgb(var(--cash-paper-rgb)/0.9)] shadow-[shadow:var(--cash-shadow-nav)]";
 
   return (
     <header
@@ -104,19 +107,22 @@ function Header() {
       </nav>
 
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         {isSignedIn ? (
           <>
             <Button
               asChild
               size="sm"
-              className="h-9 rounded-full bg-[var(--cash-ink)] px-3.5 text-white hover:bg-[var(--cash-teal)] sm:px-4"
+              className="h-9 rounded-full bg-[var(--cash-contrast)] px-3.5 text-[var(--cash-contrast-fg)] hover:bg-[var(--cash-teal-solid)] hover:text-white sm:px-4"
             >
               <Link href="/dashboard">
                 Dashboard
                 <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" aria-hidden="true" />
               </Link>
             </Button>
-            <UserButton appearance={{ elements: { avatarBox: "h-8 w-8" } }} />
+            <UserButton
+              appearance={{ elements: { ...userButtonElements, avatarBox: "h-8 w-8" } }}
+            />
           </>
         ) : (
           <>
@@ -124,14 +130,14 @@ function Header() {
               asChild
               variant="ghost"
               size="sm"
-              className="hidden h-9 rounded-full px-3.5 text-[var(--cash-ink)] hover:bg-[var(--cash-ink)]/[0.06] sm:inline-flex"
+              className="hidden h-9 rounded-full px-3.5 text-[var(--cash-ink)] hover:bg-[rgb(var(--cash-ink-rgb)/0.06)] sm:inline-flex"
             >
               <Link href="/sign-in">Sign in</Link>
             </Button>
             <Button
               asChild
               size="sm"
-              className="h-9 rounded-full bg-[var(--cash-teal)] px-4 text-white shadow-[var(--cash-shadow-button)] hover:bg-[var(--cash-ink)]"
+              className="h-9 rounded-full bg-[var(--cash-teal-solid)] px-4 text-white shadow-[var(--cash-shadow-button)] hover:bg-[var(--cash-onyx)]"
             >
               <Link href="/dashboard">
                 Get started

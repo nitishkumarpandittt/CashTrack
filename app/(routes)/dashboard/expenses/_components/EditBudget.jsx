@@ -55,7 +55,7 @@ function EditBudget({ budgetInfo, refreshData }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="h-10 rounded-full bg-[var(--cash-teal)] px-4 text-white hover:bg-[var(--cash-ink)]">
+        <Button className="h-10 rounded-full bg-[var(--cash-teal-solid)] px-4 text-white hover:bg-[var(--cash-onyx)]">
           <PenBox className="mr-2 h-4 w-4" aria-hidden="true" />
           Edit budget
         </Button>
@@ -125,7 +125,7 @@ function EditBudget({ budgetInfo, refreshData }) {
             <Button
               disabled={!(name && amount)}
               onClick={onUpdateBudget}
-              className="w-full rounded-full bg-[var(--cash-teal)] text-white hover:bg-[var(--cash-ink)] sm:w-auto"
+              className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
             >
               Save changes
             </Button>

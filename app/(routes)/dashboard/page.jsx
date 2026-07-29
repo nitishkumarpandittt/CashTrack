@@ -17,7 +17,7 @@ import EmptyState from "./_components/EmptyState";
 
 const CardInfoSkeleton = () => (
   <div className="space-y-4">
-    <div className="h-64 animate-pulse rounded-[28px] border border-[var(--cash-line)] bg-white" />
+    <div className="h-64 animate-pulse rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)]" />
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       {[1, 2, 3].map((item) => (
         <CardLoader key={item} className="h-28 rounded-[24px]" />
@@ -27,13 +27,13 @@ const CardInfoSkeleton = () => (
 );
 
 const ChartSkeleton = () => (
-  <div className="rounded-[28px] border border-[var(--cash-line)] bg-white p-6">
+  <div className="rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-6">
     <ChartLoader />
   </div>
 );
 
 const TableSkeleton = () => (
-  <div className="rounded-[28px] border border-[var(--cash-line)] bg-white p-6">
+  <div className="rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-6">
     <TableLoader rows={5} />
   </div>
 );
@@ -141,7 +141,7 @@ function Dashboard() {
             Here's what happenning with your money, Lets Manage your expense
           </p>
         </div>
-        <div className="hidden rounded-2xl border border-[var(--cash-line)] bg-white px-4 py-3 text-right shadow-sm md:block">
+        <div className="hidden rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)] px-4 py-3 text-right shadow-sm md:block">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--cash-muted)]">Today</p>
           <p className="mt-1 font-display text-sm font-bold text-[var(--cash-ink)]">A clearer next move</p>
         </div>

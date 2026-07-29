@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 import { onIntroReady } from "./motion/intro-gate";
+import { useTheme } from "./theme/ThemeProvider";
 
 // three + the fluid sim are browser-only, and there is nothing meaningful to
 // server-render for a decorative canvas.
@@ -21,6 +22,14 @@ const LiquidEther = dynamic(() => import("./LiquidEther"), { ssr: false });
 const CASH_FLUID_COLORS = ["#e6f4f2", "#50c878", "#007a74"];
 
 /**
+ * The dark counterpart: the same slow-to-fast ramp, but starting from a deep
+ * teal-ink instead of a pale wash, so the field glows where it moves rather
+ * than washing the hero out. These go to WebGL as literal colours, so unlike
+ * the rest of the app they cannot come from the CSS tokens.
+ */
+const CASH_FLUID_COLORS_DARK = ["#0e1f22", "#0a7a6f", "#35bdb0"];
+
+/**
  * How long after the intro gate the hero entrance keeps animating: MaskLines
  * run 0.05s delay + 0.2s stagger + 0.95s, the last Reveal 0.55s + 0.65s, so
  * everything has settled by ~1.2s. The sim boots after that, with margin.
@@ -29,6 +38,7 @@ const HERO_SETTLE_MS = 1400;
 
 function HeroFluidBackground() {
   const [enabled, setEnabled] = useState(false);
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -87,7 +97,7 @@ function HeroFluidBackground() {
         aria-hidden="true"
       >
         <LiquidEther
-        colors={CASH_FLUID_COLORS}
+        colors={isDark ? CASH_FLUID_COLORS_DARK : CASH_FLUID_COLORS}
         mouseForce={18}
         cursorSize={110}
         resolution={0.45}
@@ -118,7 +128,7 @@ function HeroFluidBackground() {
         a single column, so the scrim covers the full width instead.
       */}
       <div
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,rgba(244,248,247,0.92)_0%,rgba(244,248,247,0.88)_62%,rgba(244,248,247,0.45)_100%)] lg:bg-[linear-gradient(to_right,rgba(244,248,247,0.94)_0%,rgba(244,248,247,0.9)_38%,rgba(244,248,247,0.5)_56%,rgba(244,248,247,0)_72%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,rgba(var(--cash-mist-rgb),0.92)_0%,rgba(var(--cash-mist-rgb),0.88)_62%,rgba(var(--cash-mist-rgb),0.45)_100%)] lg:bg-[linear-gradient(to_right,rgba(var(--cash-mist-rgb),0.94)_0%,rgba(var(--cash-mist-rgb),0.9)_38%,rgba(var(--cash-mist-rgb),0.5)_56%,rgba(var(--cash-mist-rgb),0)_72%)]"
         aria-hidden="true"
       />
     </>

@@ -44,7 +44,7 @@ function IncomeItem({ budget, refreshData, totalSpend = 0 }) {
   };
 
   return (
-    <article className="group relative min-h-[170px] rounded-[24px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--cash-teal)]/35">
+    <article className="group relative min-h-[170px] rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--cash-teal-rgb)/0.35)]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--cash-mist)] text-2xl">
@@ -92,7 +92,7 @@ function IncomeItem({ budget, refreshData, totalSpend = 0 }) {
             <button
               type="button"
               onClick={handleDeleteClick}
-              className="rounded-full border border-transparent p-2 text-rose-500 opacity-70 transition-all hover:border-rose-200 hover:bg-rose-50 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+              className="rounded-full border border-transparent p-2 text-rose-500 dark:text-rose-400 opacity-70 transition-all hover:border-rose-200 dark:border-rose-400/30 hover:bg-rose-50 dark:hover:bg-rose-400/10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
               title="Delete income stream"
               aria-label={`Delete ${budget.name}`}
             >

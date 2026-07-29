@@ -71,9 +71,9 @@ function CreateBudget({ refreshData }) {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="group flex min-h-[170px] flex-col items-start justify-between rounded-[24px] border border-dashed border-[var(--cash-teal)]/40 bg-[var(--cash-wash)]/55 p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--cash-teal)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] focus-visible:ring-offset-2"
+          className="group flex min-h-[170px] flex-col items-start justify-between rounded-[24px] border border-dashed border-[rgb(var(--cash-teal-rgb)/0.4)] bg-[rgb(var(--cash-wash-rgb)/0.55)] p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--cash-teal)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] focus-visible:ring-offset-2"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[var(--cash-teal)] shadow-sm transition-transform duration-300 group-hover:rotate-90">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--cash-paper)] text-[var(--cash-teal)] shadow-sm transition-transform duration-300 group-hover:rotate-90">
             <Plus className="h-5 w-5" aria-hidden="true" />
           </span>
           <span>
@@ -151,7 +151,7 @@ function CreateBudget({ refreshData }) {
             <Button
               disabled={!(name && amount) || isLoading}
               onClick={onCreateBudget}
-              className="w-full rounded-full bg-[var(--cash-teal)] text-white hover:bg-[var(--cash-ink)] sm:w-auto"
+              className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2"><ButtonLoader size="sm" /> Creating budget...</span>

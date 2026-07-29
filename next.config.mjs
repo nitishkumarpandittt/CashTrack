@@ -8,9 +8,6 @@ const nextConfig = {
         imageSizes: [16, 32, 48, 64, 96, 128, 256],
     },
 
-    // Disable SWC minification in development for faster compilation
-    swcMinify: process.env.NODE_ENV === 'production',
-
     // Minimal experimental features for speed
     experimental: {
         // Only essential optimizations
@@ -27,10 +24,8 @@ const nextConfig = {
         typescript: {
             ignoreBuildErrors: true,
         },
-        // Disable ESLint during builds for speed
-        eslint: {
-            ignoreDuringBuilds: true,
-        },
+        // Next 16 dropped the `eslint` key: linting is no longer part of
+        // `next build`, so run `npm run lint` separately instead.
     }),
 
     // Optimized headers for fast development

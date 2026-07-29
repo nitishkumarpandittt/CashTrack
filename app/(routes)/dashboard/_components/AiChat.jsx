@@ -129,8 +129,8 @@ function AssistantText({ text }) {
  * (between the logo header and the account footer) and sized to fill it, so
  * it never covers the rest of the app.
  *
- * variant="sheet": a bottom sheet with a backdrop, for the mobile drawer
- * where there is no persistent sidebar to dock into.
+ * variant="sheet": a full-screen panel, for the mobile drawer where there is
+ * no persistent sidebar to dock into.
  */
 function AiChat({ open, onClose, variant = "sidebar" }) {
   const isSheet = variant === "sheet";
@@ -292,7 +292,7 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
           type="button"
           aria-label="Close assistant"
           onClick={requestClose}
-          className={`fixed inset-0 z-[60] cursor-default bg-[var(--cash-ink)]/30 backdrop-blur-[2px] transition-opacity duration-200 ${
+          className={`fixed inset-0 z-[60] cursor-default bg-[rgb(var(--cash-onyx-rgb)/0.3)] backdrop-blur-[2px] transition-opacity duration-200 ${
             closing ? "opacity-0" : "chat-backdrop-in"
           }`}
         />
@@ -303,9 +303,9 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
       aria-label="CashTrack AI assistant"
       className={`${closing ? "chat-panel-out" : "chat-panel-in"} ${
         isSheet
-          ? "fixed inset-x-0 bottom-0 z-[70] h-[82dvh] rounded-t-[24px] border-t border-[var(--cash-line)] shadow-[var(--cash-shadow-preview)]"
+          ? "fixed inset-0 z-[70]"
           : "absolute -inset-x-5 top-0 -bottom-5 z-20"
-      } flex flex-col overflow-hidden bg-white`}
+      } flex flex-col overflow-hidden bg-[var(--cash-paper)]`}
       onAnimationEnd={(e) => {
         // Message bubbles animate too and their animationend bubbles up here,
         // so gate on the panel's own exit animation.
@@ -358,7 +358,7 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
                   type="button"
                   onClick={() => send(s)}
                   disabled={contextLoading}
-                  className="block w-full rounded-xl border border-[var(--cash-line)] px-3 py-2 text-left text-[13px] font-semibold text-[var(--cash-ink)] transition-colors hover:border-[var(--cash-teal)]/40 hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] disabled:cursor-wait disabled:opacity-50"
+                  className="block w-full rounded-xl border border-[var(--cash-line)] px-3 py-2 text-left text-[13px] font-semibold text-[var(--cash-ink)] transition-colors hover:border-[rgb(var(--cash-teal-rgb)/0.4)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] disabled:cursor-wait disabled:opacity-50"
                 >
                   {s}
                 </button>
@@ -369,7 +369,7 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
           messages.map((m, i) =>
             m.role === "user" ? (
               <div key={`${m.role}-${i}`} className="chat-msg-in flex justify-end">
-                <p className="max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-[var(--cash-teal)] px-3 py-2 text-[13px] leading-5 text-white">
+                <p className="max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-[var(--cash-teal-solid)] px-3 py-2 text-[13px] leading-5 text-white">
                   {m.text}
                 </p>
               </div>
@@ -399,14 +399,14 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
         {error ? (
           <div
             role="alert"
-            className="chat-msg-in space-y-2 rounded-xl border border-rose-100 bg-rose-50/70 px-3 py-2.5"
+            className="chat-msg-in space-y-2 rounded-xl border border-rose-100 bg-rose-50/70 dark:border-rose-400/25 dark:bg-rose-400/10 px-3 py-2.5"
           >
-            <p className="text-[13px] leading-5 text-rose-700">{error}</p>
+            <p className="text-[13px] leading-5 text-rose-700 dark:text-rose-300">{error}</p>
             {lastFailed ? (
               <button
                 type="button"
                 onClick={retry}
-                className="rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-bold text-rose-700 transition-colors hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                className="rounded-full border border-rose-200 dark:border-rose-400/30 bg-[var(--cash-paper)] px-3 py-1 text-xs font-bold text-rose-700 dark:text-rose-300 transition-colors hover:bg-rose-100 dark:hover:bg-rose-400/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
               >
                 Try again
               </button>
@@ -420,7 +420,11 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
           e.preventDefault();
           send();
         }}
-        className="flex items-center gap-2 border-t border-[var(--cash-line)] bg-[var(--cash-mist)] px-4 py-3"
+        className={`flex items-center gap-2 border-t border-[var(--cash-line)] bg-[var(--cash-mist)] px-4 py-3 ${
+          // Full-screen on mobile reaches the very bottom edge, so keep the
+          // input clear of the home indicator.
+          isSheet ? "pb-[max(0.75rem,env(safe-area-inset-bottom))]" : ""
+        }`}
       >
         <input
           ref={inputRef}
@@ -428,13 +432,13 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder={contextLoading ? "Loading your numbers…" : "Ask about your money…"}
           aria-label="Your question"
-          className="h-9 min-w-0 flex-1 rounded-full border border-[var(--cash-line)] bg-white px-3.5 text-[13px] text-[var(--cash-ink)] outline-none transition-colors placeholder:text-[var(--cash-muted)] focus:border-[var(--cash-teal)]"
+          className="h-9 min-w-0 flex-1 rounded-full border border-[var(--cash-line)] bg-[var(--cash-paper)] px-3.5 text-[13px] text-[var(--cash-ink)] outline-none transition-colors placeholder:text-[var(--cash-muted)] focus:border-[var(--cash-teal)]"
         />
         <button
           type="submit"
           disabled={!input.trim() || sending || contextLoading}
           aria-label="Send"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--cash-teal)] text-white transition-colors hover:bg-[var(--cash-ink)] disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--cash-teal-solid)] text-white transition-colors hover:bg-[var(--cash-onyx)] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ArrowUp className="h-4 w-4" aria-hidden="true" />
         </button>

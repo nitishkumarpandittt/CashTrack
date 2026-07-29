@@ -54,7 +54,7 @@ function BudgetList() {
           ? [1, 2, 3, 4, 5].map((item) => (
               <div
                 key={item}
-                className="h-[170px] animate-pulse rounded-[24px] border border-[var(--cash-line)] bg-white"
+                className="h-[170px] animate-pulse rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)]"
               />
             ))
           : budgetList.length > 0
@@ -68,7 +68,7 @@ function BudgetList() {
       </div>
 
       {!isLoading && budgetList.length === 0 && (
-        <div className="mt-6 rounded-[24px] border border-dashed border-[var(--cash-line)] bg-white/60 px-6 py-12 text-center">
+        <div className="mt-6 rounded-[24px] border border-dashed border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.6)] px-6 py-12 text-center">
           <p className="font-display text-lg font-extrabold tracking-[-0.05em] text-[var(--cash-ink)]">
             Your budget space is ready.
           </p>

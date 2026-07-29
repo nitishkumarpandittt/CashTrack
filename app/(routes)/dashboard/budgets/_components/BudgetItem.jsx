@@ -14,7 +14,7 @@ function BudgetItem({ budget }) {
       className="group block rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] focus-visible:ring-offset-2"
       aria-label={`Open ${budget?.name} budget`}
     >
-      <article className="min-h-[170px] rounded-[24px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-[var(--cash-teal)]/35">
+      <article className="min-h-[170px] rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-[rgb(var(--cash-teal-rgb)/0.35)]">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--cash-mist)] text-2xl">

@@ -42,8 +42,8 @@ const LoadingSpinner = ({ size = "md", text = "Loading...", showLogo = true }) =
 };
 
 export const FullPageLoader = ({ text = "Loading CashTrack..." }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--cash-mist)]/95 px-6 backdrop-blur-sm">
-    <div className="w-full max-w-sm rounded-[28px] border border-[var(--cash-line)] bg-white p-8 text-center shadow-[var(--cash-shadow-preview)]">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--cash-mist-rgb)/0.95)] px-6 backdrop-blur-sm">
+    <div className="w-full max-w-sm rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-8 text-center shadow-[var(--cash-shadow-preview)]">
       <LoadingSpinner size="xl" text={text} showLogo />
       <div className="mx-auto mt-7 h-1.5 w-full overflow-hidden rounded-full bg-[var(--cash-wash)]">
         <div className="h-full w-3/5 animate-pulse rounded-full bg-[var(--cash-teal)]" />
@@ -55,7 +55,7 @@ export const FullPageLoader = ({ text = "Loading CashTrack..." }) => (
 
 export const CardLoader = ({ className = "" }) => (
   <div className={`animate-pulse ${className}`}>
-    <div className="rounded-2xl border border-[var(--cash-line)] bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)] p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-2xl bg-[var(--cash-wash)]" />
@@ -75,7 +75,7 @@ export const CardLoader = ({ className = "" }) => (
 );
 
 export const TableLoader = ({ rows = 5 }) => (
-  <div className="animate-pulse overflow-hidden rounded-2xl border border-[var(--cash-line)] bg-white">
+  <div className="animate-pulse overflow-hidden rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)]">
     <div className="grid grid-cols-4 gap-4 border-b border-[var(--cash-line)] bg-[var(--cash-mist)] px-6 py-4">
       {[1, 2, 3, 4].map((item) => <div key={item} className="h-3 rounded-full bg-[var(--cash-wash)]" />)}
     </div>
@@ -104,7 +104,7 @@ export const ButtonLoader = ({ size = "md" }) => {
 };
 
 export const AIAdviceLoader = () => (
-  <div className="animate-pulse rounded-[28px] border border-[var(--cash-line)] bg-white p-6">
+  <div className="animate-pulse rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-6">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-2xl bg-[var(--cash-wash)]" />

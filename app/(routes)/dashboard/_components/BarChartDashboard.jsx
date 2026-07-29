@@ -27,7 +27,7 @@ function BarChartDashboard({ budgetList, isLoading = false }) {
     if (!active || !payload?.length) return null;
 
     return (
-      <div className="rounded-2xl border border-[var(--cash-line)] bg-white p-4 shadow-[var(--cash-shadow-card)]">
+      <div className="rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)] p-4 shadow-[var(--cash-shadow-card)]">
         <p className="font-display text-sm font-extrabold tracking-[-0.03em] text-[var(--cash-ink)]">
           {label}
         </p>
@@ -42,7 +42,7 @@ function BarChartDashboard({ budgetList, isLoading = false }) {
   };
 
   return (
-    <section className="rounded-[28px] border border-[var(--cash-line)] bg-white p-5 shadow-[var(--cash-shadow-card)] md:p-7">
+    <section className="rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] md:p-7">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cash-teal)]">

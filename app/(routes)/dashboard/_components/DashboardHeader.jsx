@@ -5,6 +5,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
+import ThemeToggle from "@/app/_components/theme/ThemeToggle";
+import { userButtonElements } from "@/app/_components/theme/clerkAppearance";
+
 const pageTitles = {
   "/dashboard": "Overview",
   "/dashboard/incomes": "Income streams",
@@ -20,7 +23,7 @@ function DashboardHeader({ onMenuToggle, isMobileNavOpen }) {
     (pathname.startsWith("/dashboard/expenses/") ? "Budget details" : "Workspace");
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[var(--cash-line)] bg-white/80 px-4 py-3 backdrop-blur md:px-8 md:py-4">
+    <header className="sticky top-0 z-30 border-b border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.8)] px-4 py-3 backdrop-blur md:px-8 md:py-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <button
@@ -53,13 +56,14 @@ function DashboardHeader({ onMenuToggle, isMobileNavOpen }) {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full border border-[var(--cash-line)] bg-white px-3 py-2 text-xs font-semibold text-[var(--cash-muted)] sm:flex">
+          <div className="hidden items-center gap-2 rounded-full border border-[var(--cash-line)] bg-[var(--cash-paper)] px-3 py-2 text-xs font-semibold text-[var(--cash-muted)] sm:flex">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--cash-emerald)]" aria-hidden="true" />
             Synced just now
           </div>
+          <ThemeToggle />
           <UserButton
             afterSignOutUrl="/"
-            appearance={{ elements: { avatarBox: "h-9 w-9" } }}
+            appearance={{ elements: { ...userButtonElements, avatarBox: "h-9 w-9" } }}
           />
         </div>
       </div>

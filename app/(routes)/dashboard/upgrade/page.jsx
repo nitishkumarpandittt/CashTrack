@@ -40,12 +40,12 @@ function Upgrade() {
             key={plan.name}
             className={`relative flex flex-col rounded-[28px] border p-6 shadow-[var(--cash-shadow-card)] sm:p-8 ${
               plan.featured
-                ? "border-[var(--cash-teal)] bg-[var(--cash-ink)] text-white"
-                : "border-[var(--cash-line)] bg-white text-[var(--cash-ink)]"
+                ? "border-[var(--cash-teal)] bg-[var(--cash-onyx)] text-white"
+                : "border-[var(--cash-line)] bg-[var(--cash-paper)] text-[var(--cash-ink)]"
             }`}
           >
             {plan.featured && (
-              <div className="absolute right-6 top-6 rounded-full bg-[var(--cash-emerald)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--cash-ink)]">
+              <div className="absolute right-6 top-6 rounded-full bg-[var(--cash-emerald)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--cash-onyx)]">
                 Recommended
               </div>
             )}
@@ -67,7 +67,7 @@ function Upgrade() {
             <ul className="mt-7 flex-1 space-y-4">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-sm">
-                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-[var(--cash-emerald)] text-[var(--cash-ink)]" : "bg-[var(--cash-wash)] text-[var(--cash-teal)]"}`}>
+                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-[var(--cash-emerald)] text-[var(--cash-onyx)]" : "bg-[var(--cash-wash)] text-[var(--cash-teal)]"}`}>
                     <Check className="h-3 w-3" aria-hidden="true" />
                   </span>
                   <span className={plan.featured ? "text-white/80" : "text-[var(--cash-muted)]"}>{feature}</span>
@@ -79,8 +79,8 @@ function Upgrade() {
               href="#"
               className={`mt-10 inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] focus-visible:ring-offset-2 ${
                 plan.featured
-                  ? "bg-[var(--cash-emerald)] text-[var(--cash-ink)] hover:bg-white"
-                  : "border border-[var(--cash-teal)] text-[var(--cash-teal)] hover:bg-[var(--cash-teal)] hover:text-white"
+                  ? "bg-[var(--cash-emerald)] text-[var(--cash-onyx)] hover:bg-white"
+                  : "border border-[var(--cash-teal)] text-[var(--cash-teal)] hover:bg-[var(--cash-teal-solid)] hover:text-white"
               }`}
             >
               Get Started

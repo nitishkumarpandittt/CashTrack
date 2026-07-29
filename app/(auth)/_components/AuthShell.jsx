@@ -4,10 +4,9 @@ import Link from "next/link";
 function AuthShell({ children }) {
   return (
     <main className="min-h-screen bg-[var(--cash-mist)] px-4 py-4 sm:px-6 sm:py-6">
-      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1280px] overflow-hidden rounded-[32px] border border-[var(--cash-line)] bg-white shadow-[var(--cash-shadow-preview)] sm:min-h-[calc(100vh-3rem)] lg:grid-cols-[0.92fr_1.08fr]">
-        <section className="relative hidden overflow-hidden bg-[var(--cash-ink)] p-8 text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border-[38px] border-[var(--cash-teal)]/35" aria-hidden="true" />
-          <div className="pointer-events-none absolute bottom-12 right-10 h-24 w-24 rounded-full border border-[var(--cash-emerald)]/35" aria-hidden="true" />
+      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1280px] overflow-hidden rounded-[32px] border border-[var(--cash-line)] bg-[var(--cash-paper)] shadow-[var(--cash-shadow-preview)] sm:min-h-[calc(100vh-3rem)] lg:grid-cols-[0.92fr_1.08fr]">
+        <section className="relative hidden overflow-hidden bg-[var(--cash-onyx)] p-8 text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border-[38px] border-[rgb(var(--cash-teal-rgb)/0.35)]" aria-hidden="true" />
 
           <Link href="/" className="relative z-10 flex items-center gap-3" aria-label="CashTrack home">
             <Image src="/cashtrack-icon-theme.svg" alt="" width={42} height={42} priority className="h-[42px] w-[42px] shrink-0" />
@@ -37,7 +36,7 @@ function AuthShell({ children }) {
           </div>
         </section>
 
-        <section className="flex items-center justify-center bg-white px-5 py-10 sm:px-10 lg:px-14">
+        <section className="flex items-center justify-center bg-[var(--cash-paper)] px-5 py-10 sm:px-10 lg:px-14">
           <div className="w-full max-w-md">
             <Link href="/" className="mb-10 flex items-center gap-3 lg:hidden" aria-label="CashTrack home">
               <Image src="/cashtrack-icon-theme.svg" alt="" width={38} height={38} priority className="h-[38px] w-[38px] shrink-0" />

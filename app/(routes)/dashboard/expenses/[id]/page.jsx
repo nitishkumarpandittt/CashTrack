@@ -105,7 +105,7 @@ function ExpensesScreen({ params }) {
           <EditBudget budgetInfo={budgetInfo} refreshData={getBudgetInfo} />
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" className="h-10 rounded-full border-rose-200 px-4 text-rose-500 hover:bg-rose-50 hover:text-rose-600">
+              <Button variant="outline" className="h-10 rounded-full border-rose-200 dark:border-rose-400/30 px-4 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-400/10 hover:text-rose-600">
                 <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
                 Delete budget
               </Button>
@@ -134,7 +134,7 @@ function ExpensesScreen({ params }) {
         {budgetInfo ? (
           <BudgetItem budget={budgetInfo} />
         ) : (
-          <div className="h-[170px] animate-pulse rounded-[24px] border border-[var(--cash-line)] bg-white" />
+          <div className="h-[170px] animate-pulse rounded-[24px] border border-[var(--cash-line)] bg-[var(--cash-paper)]" />
         )}
         <AddExpense budgetId={params.id} user={user} refreshData={getBudgetInfo} />
       </div>

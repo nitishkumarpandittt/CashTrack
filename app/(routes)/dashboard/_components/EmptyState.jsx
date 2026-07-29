@@ -20,7 +20,7 @@ function EmptyState({
 }) {
   return (
     <div
-      className={`rounded-[24px] border border-dashed border-[var(--cash-line)] bg-white/60 text-center ${
+      className={`rounded-[24px] border border-dashed border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.6)] text-center ${
         compact ? "px-5 py-8" : "px-6 py-12"
       } ${className}`}
     >
@@ -43,7 +43,7 @@ function EmptyState({
       {actionLabel && actionHref ? (
         <Link
           href={actionHref}
-          className="mt-6 inline-flex items-center rounded-full bg-[var(--cash-teal)] px-5 py-2.5 text-sm font-bold text-white shadow-[var(--cash-shadow-button)] transition-colors hover:bg-[var(--cash-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] focus-visible:ring-offset-2"
+          className="mt-6 inline-flex items-center rounded-full bg-[var(--cash-teal-solid)] px-5 py-2.5 text-sm font-bold text-white shadow-[var(--cash-shadow-button)] transition-colors hover:bg-[var(--cash-onyx)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] focus-visible:ring-offset-2"
         >
           {actionLabel}
           <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CircleDollarSign,
+  Home,
   LayoutGrid,
   PiggyBank,
   ReceiptText,
@@ -21,11 +22,12 @@ function MobileNav({ isOpen, onClose }) {
   const [chatOpen, setChatOpen] = useState(false);
   const menuList = useMemo(
     () => [
-      { id: 1, name: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
-      { id: 2, name: "Incomes", icon: CircleDollarSign, path: "/dashboard/incomes" },
-      { id: 3, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
-      { id: 4, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
-      { id: 5, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
+      { id: 1, name: "Home", icon: Home, path: "/" },
+      { id: 2, name: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
+      { id: 3, name: "Incomes", icon: CircleDollarSign, path: "/dashboard/incomes" },
+      { id: 4, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
+      { id: 5, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
+      { id: 6, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
     ],
     []
   );
@@ -50,20 +52,24 @@ function MobileNav({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  // "/" and "/dashboard" are prefixes of every other route, so they only count
+  // as active on an exact match.
   const isActivePath = (menuPath) =>
-    menuPath === "/dashboard" ? path === menuPath : path.startsWith(menuPath);
+    menuPath === "/dashboard" || menuPath === "/"
+      ? path === menuPath
+      : path.startsWith(menuPath);
 
   return (
     <div className="md:hidden">
       <button
         type="button"
         aria-label="Close navigation"
-        className="fixed inset-0 z-40 cursor-default bg-[var(--cash-ink)]/35 backdrop-blur-sm"
+        className="fixed inset-0 z-40 cursor-default bg-[rgb(var(--cash-onyx-rgb)/0.35)] backdrop-blur-sm"
         onClick={onClose}
       />
 
       <aside
-        className="fixed inset-y-0 left-0 z-50 flex w-[min(86vw,22rem)] flex-col border-r border-[var(--cash-line)] bg-white px-5 py-6 shadow-[var(--cash-shadow-preview)]"
+        className="fixed inset-y-0 left-0 z-50 flex w-[min(86vw,22rem)] flex-col border-r border-[var(--cash-line)] bg-[var(--cash-paper)] px-5 py-6 shadow-[var(--cash-shadow-preview)]"
         role="dialog"
         aria-modal="true"
         aria-label="CashTrack navigation"
@@ -125,7 +131,7 @@ function MobileNav({ isOpen, onClose }) {
         <button
           type="button"
           onClick={() => setChatOpen(true)}
-          className="group mt-auto w-full rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)] p-4 text-left transition-colors hover:border-[var(--cash-teal)]/40 hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)]"
+          className="group mt-auto w-full rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)] p-4 text-left transition-colors hover:border-[rgb(var(--cash-teal-rgb)/0.4)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)]"
         >
           <span className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-[var(--cash-teal)]" aria-hidden="true" />
