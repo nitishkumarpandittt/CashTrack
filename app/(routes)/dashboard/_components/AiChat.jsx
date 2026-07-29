@@ -7,58 +7,13 @@ import { Sparkles, ArrowUp, X, RotateCcw } from "lucide-react";
 
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses, Incomes } from "@/utils/schema";
-import { deriveInsights } from "@/utils/deriveInsights";
+import { buildFinancialContext } from "@/utils/financialContext";
 
 const STARTERS = [
   "Where is most of my money going?",
   "Am I saving enough?",
   "Which budget should I worry about?",
 ];
-
-const rupees = (n) => `Rs.${Math.round(Number(n) || 0).toLocaleString("en-IN")}`;
-
-/**
- * Compact, factual snapshot handed to the model. Kept small and explicit so
- * answers stay anchored to real figures instead of being invented.
- */
-function buildContext({ budgets, incomes, expenses }) {
-  const { totals } = deriveInsights({
-    budgetList: budgets,
-    incomeList: incomes,
-    expensesList: expenses,
-  });
-
-  const lines = [
-    `Total income: ${rupees(totals.totalIncome)}`,
-    `Total budgeted: ${rupees(totals.totalBudget)}`,
-    `Total spent: ${rupees(totals.totalSpend)}`,
-    `Surplus: ${rupees(totals.surplus)}`,
-    totals.savingsRate === null
-      ? "Savings rate: not available (no income recorded)"
-      : `Savings rate: ${totals.savingsRate.toFixed(1)}%`,
-    "",
-    "BUDGETS (name | limit | spent):",
-    ...(budgets.length
-      ? budgets.map(
-          (b) => `- ${b.name} | ${rupees(b.amount)} | ${rupees(b.totalSpend)}`
-        )
-      : ["- none"]),
-    "",
-    "INCOME SOURCES (name | amount):",
-    ...(incomes.length
-      ? incomes.map((i) => `- ${i.name} | ${rupees(i.amount)}`)
-      : ["- none"]),
-    "",
-    "RECENT EXPENSES (name | amount | date):",
-    ...(expenses.length
-      ? expenses
-          .slice(0, 25)
-          .map((e) => `- ${e.name} | ${rupees(e.amount)} | ${e.createdAt || "unknown"}`)
-      : ["- none"]),
-  ];
-
-  return lines.join("\n");
-}
 
 /** Bold runs (**text**) inside a single line, without dangerouslySetInnerHTML. */
 function renderInline(text) {
@@ -77,9 +32,9 @@ function renderInline(text) {
 }
 
 /**
- * Gemini answers arrive as light markdown (bold, `-`/`*` bullets). Rendering
- * the raw asterisks looks broken, so parse just those two constructs into
- * paragraphs and lists; anything else stays plain text.
+ * Answers arrive as light markdown (bold, `-`/`*` bullets). Rendering the raw
+ * asterisks looks broken, so parse just those two constructs into paragraphs
+ * and lists; anything else stays plain text.
  */
 function AssistantText({ text }) {
   const blocks = [];
@@ -201,7 +156,15 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
             .where(eq(Budgets.createdBy, email))
             .orderBy(desc(Expenses.id)),
         ]);
-        if (!cancelled) setContext(buildContext({ budgets, incomes, expenses }));
+        if (!cancelled) {
+          setContext(
+            buildFinancialContext({
+              budgetList: budgets,
+              incomeList: incomes,
+              expensesList: expenses,
+            })
+          );
+        }
       } catch (err) {
         console.error("Could not load context for chat:", err);
         if (!cancelled) setContext("");

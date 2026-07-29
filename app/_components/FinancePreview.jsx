@@ -53,6 +53,7 @@ function FinancePreview() {
               sizes="(max-width: 768px) 92vw, 680px"
               className="object-cover object-left-top"
               priority
+              draggable={false}
             />
             <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[rgba(15,22,32,0.14)] to-transparent" aria-hidden="true" />
           </div>

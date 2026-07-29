@@ -76,7 +76,9 @@ function Header() {
         className="flex items-center gap-2.5 rounded-full px-1 py-1"
         aria-label="CashTrack home"
       >
-        <Image src="/cashtrack-icon-theme.svg" alt="" width={30} height={30} priority />
+        {/* -webkit-user-drag covers Chrome/Safari; Firefox only honours the
+            attribute, so both are needed to kill the drag ghost. */}
+        <Image src="/cashtrack-icon-theme.svg" alt="" width={30} height={30} priority draggable={false} />
         <span className="font-display text-[15px] font-extrabold tracking-[-0.04em] text-[var(--cash-ink)] sm:text-base">
           CashTrack
         </span>

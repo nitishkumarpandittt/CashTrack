@@ -221,6 +221,37 @@
   .font-body {
     font-family: var(--font-source-sans), sans-serif;
   }
+
+  /* The landing page is a product surface, not a document. Selecting its copy
+     only ever produced the blue-highlight smear (and text you could then drag
+     around the page) — never anything a visitor wanted. user-select: none
+     inherits, so one class on the page root covers every section.
+
+     Anything that genuinely needs a caret is exempted below, so this cannot
+     silently break a field someone has to type into. */
+  .cash-no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Kills the drag ghost on the logo, the preview screenshot, and link drags. */
+  .cash-no-select a,
+  .cash-no-select img,
+  .cash-no-select svg {
+    -webkit-user-drag: none;
+  }
+
+  .cash-no-select input,
+  .cash-no-select textarea,
+  .cash-no-select select,
+  .cash-no-select [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

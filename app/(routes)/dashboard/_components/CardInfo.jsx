@@ -2,6 +2,7 @@ import formatNumber from "@/utils";
 import getAdvancedFinancialAdvice from "@/utils/getAdvancedFinancialAdvice";
 import {
   AlertCircle,
+  ArrowRight,
   CheckCircle,
   PiggyBank,
   ReceiptText,
@@ -79,85 +80,61 @@ const metrics = [
 ];
 
 function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false }) {
-  const [totalBudget, setTotalBudget] = useState(0);
-  const [totalSpend, setTotalSpend] = useState(0);
-  const [totalIncome, setTotalIncome] = useState(0);
-  const [financialAdvice, setFinancialAdvice] = useState("");
+  const [brief, setBrief] = useState(null);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
-  const [savingsRate, setSavingsRate] = useState(0);
-  const [financialHealth, setFinancialHealth] = useState("neutral");
 
-  useEffect(() => {
-    if (budgetList.length > 0 || incomeList.length > 0) {
-      calculateCardInfo();
-    }
-  }, [budgetList, incomeList]);
-
-  useEffect(() => {
-    if (totalBudget > 0 || totalIncome > 0 || totalSpend > 0) {
-      const fetchFinancialAdvice = async () => {
-        setIsLoadingAdvice(true);
-        try {
-          const advice = await getAdvancedFinancialAdvice(
-            totalBudget,
-            totalIncome,
-            totalSpend,
-            budgetList,
-            expensesList
-          );
-          setFinancialAdvice(advice);
-
-          const savings = Number(totalIncome) - Number(totalSpend);
-          const rate = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
-          const validRate = Number.isNaN(rate) ? 0 : rate;
-          setSavingsRate(validRate);
-
-          if (rate >= 20) setFinancialHealth("excellent");
-          else if (rate >= 10) setFinancialHealth("good");
-          else if (rate >= 0) setFinancialHealth("fair");
-          else setFinancialHealth("poor");
-        } catch (error) {
-          console.error("Error fetching advice:", error);
-          setFinancialAdvice("Unable to generate financial insights at the moment.");
-        } finally {
-          setIsLoadingAdvice(false);
-        }
-      };
-
-      fetchFinancialAdvice();
-    }
-  }, [totalBudget, totalIncome, totalSpend, budgetList, expensesList]);
-
-  const calculateCardInfo = () => {
-    let nextBudget = 0;
-    let nextSpend = 0;
-    let nextIncome = 0;
-
-    budgetList.forEach((budget) => {
-      nextBudget += Number(budget.amount) || 0;
-      nextSpend += Number(budget.totalSpend) || 0;
-    });
-
-    incomeList.forEach((income) => {
-      nextIncome += Number(income.amount) || 0;
-    });
-
-    setTotalIncome(Number.isNaN(nextIncome) ? 0 : nextIncome);
-    setTotalBudget(Number.isNaN(nextBudget) ? 0 : nextBudget);
-    setTotalSpend(Number.isNaN(nextSpend) ? 0 : nextSpend);
-  };
-
-  const { insights } = useMemo(
+  // Totals and the deterministic observations come from the same pass, so the
+  // header, the metric row and the quick read can never disagree with one
+  // another the way separate state slices used to.
+  const { insights, totals } = useMemo(
     () => deriveInsights({ budgetList, incomeList, expensesList }),
     [budgetList, incomeList, expensesList]
   );
+  const { totalBudget, totalSpend, totalIncome, surplus, savingsRate, budgetUse } = totals;
+
+  const hasFigures = totalBudget > 0 || totalIncome > 0 || totalSpend > 0;
+
+  useEffect(() => {
+    if (!hasFigures) return undefined;
+
+    let cancelled = false;
+    setIsLoadingAdvice(true);
+
+    getAdvancedFinancialAdvice({ budgetList, incomeList, expensesList })
+      .then((result) => {
+        if (!cancelled) setBrief(result);
+      })
+      .catch((error) => {
+        console.error("Error fetching advice:", error);
+        if (!cancelled) setBrief(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingAdvice(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hasFigures, budgetList, incomeList, expensesList]);
+
+  // Savings rate is only meaningful once there is income to measure against.
+  const financialHealth =
+    savingsRate === null
+      ? "neutral"
+      : savingsRate >= 20
+        ? "excellent"
+        : savingsRate >= 10
+          ? "good"
+          : savingsRate >= 0
+            ? "fair"
+            : "poor";
 
   const health = healthStyles[financialHealth] || healthStyles.neutral;
   const HealthIcon = health.icon;
   const metricValues = {
-    savingsRate: `${Number.isNaN(savingsRate) ? "0.0" : savingsRate.toFixed(1)}%`,
-    surplus: `Rs.${formatNumber(Number(totalIncome) - Number(totalSpend))}`,
-    budgetUse: `${totalBudget > 0 ? ((Number(totalSpend) / Number(totalBudget)) * 100).toFixed(1) : "0.0"}%`,
+    savingsRate: savingsRate === null ? "—" : `${savingsRate.toFixed(1)}%`,
+    surplus: `Rs.${formatNumber(surplus)}`,
+    budgetUse: `${budgetUse.toFixed(1)}%`,
   };
 
   return (
@@ -240,15 +217,13 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
 
               {/* The Gemini call is an optional extra layer; the observations
                   above stand on their own if it is unavailable. */}
-              {isLoadingAdvice ? (
-                <div className="mt-3 flex items-center gap-3 px-1 text-xs text-[var(--cash-muted)]">
+              {isLoadingAdvice && !brief ? (
+                <div className="mt-4 flex items-center gap-3 border-t border-[var(--cash-line)] px-1 pt-4 text-xs text-[var(--cash-muted)]">
                   <LoadingSpinner size="sm" text="" showLogo={false} />
-                  <span>Looking for a deeper pattern…</span>
+                  <span>Reading your full picture…</span>
                 </div>
-              ) : financialAdvice ? (
-                <p className="mt-3 border-t border-[var(--cash-line)] px-1 pt-3 text-sm leading-6 text-[var(--cash-muted)]">
-                  {financialAdvice}
-                </p>
+              ) : brief && (brief.summary || brief.sections.length > 0) ? (
+                <FinancialBrief brief={brief} />
               ) : null}
             </div>
           </section>
@@ -294,6 +269,89 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
           actionHref="/dashboard/budgets"
         />
       )}
+    </div>
+  );
+}
+
+/**
+ * The model's read of the whole picture: a verdict, the reasoning behind it,
+ * and what to do next. Rendered below the computed observations rather than
+ * instead of them — those are instant and always correct, this adds the
+ * connections between them.
+ *
+ * `source === "local"` means the API was unreachable and the brief was
+ * assembled from the same computed observations, so the "Next steps" list is
+ * simply empty rather than invented.
+ */
+function FinancialBrief({ brief }) {
+  const { headline, summary, sections, actions } = brief;
+
+  return (
+    <div className="mt-5 border-t border-[var(--cash-line)] pt-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cash-glaucous)]">
+          Deep dive
+        </p>
+        {brief.source === "local" ? (
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--cash-muted)]">
+            Offline analysis
+          </p>
+        ) : null}
+      </div>
+
+      {headline ? (
+        <h3 className="mt-2 font-display text-lg font-extrabold leading-tight tracking-[-0.05em] text-[var(--cash-ink)]">
+          {headline}
+        </h3>
+      ) : null}
+
+      {summary ? (
+        <p className="mt-2 text-sm leading-6 text-[var(--cash-muted)]">{summary}</p>
+      ) : null}
+
+      {sections.length > 0 ? (
+        <div className="mt-4 space-y-3">
+          {sections.map((section, i) => {
+            const tone = toneStyles[section.tone] || toneStyles.info;
+            const ToneIcon = tone.icon;
+            return (
+              <div key={`${section.title}-${i}`} className="flex gap-3">
+                <ToneIcon className={`mt-1 h-4 w-4 shrink-0 ${tone.icon_}`} aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="font-display text-sm font-extrabold tracking-[-0.02em] text-[var(--cash-ink)]">
+                    {section.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-[var(--cash-muted)]">{section.detail}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {actions.length > 0 ? (
+        <div className="mt-5 rounded-2xl bg-[var(--cash-mist)] px-4 py-3.5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cash-teal)]">
+            Next steps
+          </p>
+          <ul className="mt-2.5 space-y-2">
+            {actions.map((action, i) => (
+              <li key={`${action.label}-${i}`} className="flex gap-2.5">
+                <ArrowRight
+                  className="mt-1 h-3.5 w-3.5 shrink-0 text-[var(--cash-teal)]"
+                  aria-hidden="true"
+                />
+                <p className="text-sm leading-6 text-[var(--cash-ink)]">
+                  <span className="font-bold">{action.label}</span>
+                  {action.detail ? (
+                    <span className="text-[var(--cash-muted)]"> — {action.detail}</span>
+                  ) : null}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

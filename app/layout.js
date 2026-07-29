@@ -33,7 +33,10 @@ export default function RootLayout({ children }) {
           class list before React hydrates, and browser extensions routinely
           add their own attributes to <body> (bis_register, cz-shortcut-listen
           and friends). Both are expected client-only attribute differences. */}
-      <html lang="en" suppressHydrationWarning>
+      {/* data-scroll-behavior: globals.css sets `scroll-behavior: smooth`, and
+          Next needs this marker to know it should suppress that during route
+          transitions so restored scroll positions do not animate. */}
+      <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/cashtrack-icon-theme.svg" />
