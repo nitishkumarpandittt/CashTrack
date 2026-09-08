@@ -47,7 +47,7 @@ function AuthShell({ children }) {
           </div>
         </section>
 
-        <section className="flex flex-1 items-start justify-center px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-8 sm:items-center sm:px-10 sm:py-12 lg:px-14">
+        <section className="flex flex-1 items-start justify-center px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-8 sm:items-center sm:px-10 sm:py-12 lg:px-14">
           <div className="w-full max-w-md">{children}</div>
         </section>
       </div>

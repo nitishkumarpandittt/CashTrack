@@ -649,3 +649,20 @@
     font-size: 16px !important;
   }
 }
+
+/* The display face's negative tracking lets the first glyph overhang its box;
+   Clerk clips that with overflow:hidden on the card, so let it breathe. */
+.cl-rootBox,
+.cl-cardBox,
+.cl-card,
+.cl-header {
+  overflow: visible !important;
+}
+
+.cl-card {
+  margin: 0 !important;
+}
+
+.cl-headerTitle {
+  padding-left: 0.08em;
+}

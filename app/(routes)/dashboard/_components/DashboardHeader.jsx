@@ -24,14 +24,14 @@ function DashboardHeader({ onMenuToggle, isMobileNavOpen }) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.8)] px-4 py-3 backdrop-blur md:px-8 md:py-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-3 sm:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={onMenuToggle}
             aria-label={isMobileNavOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={isMobileNavOpen}
-            className="rounded-full p-2 text-[var(--cash-muted)] transition-colors hover:bg-[var(--cash-mist)] hover:text-[var(--cash-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] md:hidden"
+            className="shrink-0 rounded-full p-2 text-[var(--cash-muted)] transition-colors hover:bg-[var(--cash-mist)] hover:text-[var(--cash-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)] md:hidden"
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -42,7 +42,7 @@ function DashboardHeader({ onMenuToggle, isMobileNavOpen }) {
             width={32}
             height={32}
             priority
-            className="md:hidden"
+            className="shrink-0 md:hidden"
           />
 
           <div className="min-w-0">
@@ -55,9 +55,11 @@ function DashboardHeader({ onMenuToggle, isMobileNavOpen }) {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full border border-[var(--cash-line)] bg-[var(--cash-paper)] px-3 py-2 text-xs font-semibold text-[var(--cash-muted)] sm:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--cash-emerald)]" aria-hidden="true" />
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {/* The sync pill is decorative; it must never wrap, and it only gets
+              room once the title no longer competes for it. */}
+          <div className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[var(--cash-line)] bg-[var(--cash-paper)] px-3 py-2 text-xs font-semibold leading-none text-[var(--cash-muted)] lg:inline-flex">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--cash-emerald)]" aria-hidden="true" />
             Synced just now
           </div>
           <ThemeToggle />

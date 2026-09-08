@@ -2,6 +2,7 @@ import { Manrope, Source_Sans_3 } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import ThemeProvider, { themeInitScript } from "@/app/_components/theme/ThemeProvider";
+import { clerkLocalization } from "@/app/_components/theme/clerkLocalization";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -34,7 +35,10 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      localization={clerkLocalization}
+    >
       {/* suppressHydrationWarning: the theme script below rewrites <html>'s
           class list before React hydrates, and browser extensions routinely
           add their own attributes to <body> (bis_register, cz-shortcut-listen
