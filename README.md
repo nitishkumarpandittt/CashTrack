@@ -334,6 +334,33 @@ The application is optimized for speed:
    - Open Drizzle Studio: `npm run db:studio`
    - Check tables are created correctly
 
+### Troubleshooting: budgets, incomes or expenses will not save
+
+Every read and write runs in the browser against `NEXT_PUBLIC_DATABASE_URL`, so a
+broken connection string looks like an empty account until you try to save
+something. The error toast shows the database's own message; to check the
+database itself:
+
+```bash
+npm run db:check
+```
+
+It verifies the connection, the tables and columns, write privileges and the
+`id` sequences, and prints the SQL to fix anything it finds. To check the
+database a deployment uses, pass that deployment's connection string:
+
+```bash
+DATABASE_URL="postgresql://..." npm run db:check
+```
+
+Two production-specific rules:
+
+- `NEXT_PUBLIC_*` variables are baked into the bundle at **build** time. After
+  adding or changing `NEXT_PUBLIC_DATABASE_URL` in your host's *Production*
+  environment, redeploy; editing the variable alone changes nothing.
+- `npm run db:push` must be run against the **same** database the deployment
+  points at, otherwise the tables (or new columns) exist only locally.
+
 ### Clerk Authentication Setup
 
 1. **Create Clerk Application**

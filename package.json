@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "db:push": "drizzle-kit push",
-    "db:studio": "npx drizzle-kit studio"
+    "db:studio": "npx drizzle-kit studio",
+    "db:check": "node scripts/db-check.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.2",

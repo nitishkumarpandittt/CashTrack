@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -20,12 +19,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { db } from "@/utils/dbConfig";
 import { Budgets } from "@/utils/schema";
+import { describeDbError } from "@/utils/dbErrors";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { ButtonLoader } from "@/app/_components/LoadingSpinner";
 import { Plus, Sparkles } from "lucide-react";
 
 function CreateBudget({ refreshData }) {
+  const [open, setOpen] = useState(false);
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,8 +35,24 @@ function CreateBudget({ refreshData }) {
   const { user } = useUser();
 
   const onCreateBudget = async () => {
-    if (!name || !amount) {
+    const trimmedName = name.trim();
+    if (!trimmedName || !amount) {
       toast.error("Please fill in all fields");
+      return;
+    }
+    if (!(Number(amount) > 0)) {
+      toast.error("Enter a budget amount greater than zero");
+      return;
+    }
+
+    // Budgets are keyed by the signed-in user's email. Without it the insert
+    // would only fail later on the NOT NULL constraint, with a message nobody
+    // can act on.
+    const createdBy = user?.primaryEmailAddress?.emailAddress;
+    if (!createdBy) {
+      toast.error("Your account has no email address on file", {
+        description: "Add an email to your account (or sign out and back in), then try again.",
+      });
       return;
     }
 
@@ -44,9 +61,9 @@ function CreateBudget({ refreshData }) {
       const result = await db
         .insert(Budgets)
         .values({
-          name,
+          name: trimmedName,
           amount,
-          createdBy: user?.primaryEmailAddress?.emailAddress,
+          createdBy,
           icon: emojiIcon,
         })
         .returning({ insertedId: Budgets.id });
@@ -57,17 +74,30 @@ function CreateBudget({ refreshData }) {
         setName("");
         setAmount("");
         setEmojiIcon("😀");
+        setOpen(false);
       }
     } catch (error) {
       console.error("Error creating budget:", error);
-      toast.error("Failed to create budget. Please try again.");
+      // The dialog stays open so nothing typed is lost, and the toast carries
+      // the database's own explanation: "please try again" hid every
+      // production failure behind the same sentence.
+      toast.error("Failed to create budget", {
+        description: describeDbError(error),
+        duration: 12000,
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const onOpenChange = (nextOpen) => {
+    if (isLoading) return;
+    setOpen(nextOpen);
+    if (!nextOpen) setOpenEmojiPicker(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <button
           type="button"
@@ -147,19 +177,17 @@ function CreateBudget({ refreshData }) {
         </div>
 
         <DialogFooter className="mt-2 sm:justify-end">
-          <DialogClose asChild>
-            <Button
-              disabled={!(name && amount) || isLoading}
-              onClick={onCreateBudget}
-              className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2"><ButtonLoader size="sm" /> Creating budget...</span>
-              ) : (
-                <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" aria-hidden="true" /> Create budget</span>
-              )}
-            </Button>
-          </DialogClose>
+          <Button
+            disabled={!(name && amount) || isLoading}
+            onClick={onCreateBudget}
+            className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2"><ButtonLoader size="sm" /> Creating budget...</span>
+            ) : (
+              <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" aria-hidden="true" /> Create budget</span>
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
