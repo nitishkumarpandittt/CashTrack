@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useUser } from "@clerk/nextjs";
-import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { Sparkles, ArrowUp, X, RotateCcw } from "lucide-react";
 
-import { db } from "@/utils/dbConfig";
-import { Budgets, Expenses, Incomes } from "@/utils/schema";
-import { buildFinancialContext } from "@/utils/financialContext";
+import { getFinancialContext } from "@/app/actions/dashboard";
+import { callAction } from "@/utils/callAction";
 
 const STARTERS = [
   "Where is most of my money going?",
@@ -89,7 +86,6 @@ function AssistantText({ text }) {
  */
 function AiChat({ open, onClose, variant = "sidebar" }) {
   const isSheet = variant === "sheet";
-  const { user } = useUser();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -125,56 +121,25 @@ function AiChat({ open, onClose, variant = "sidebar" }) {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
   }, []);
 
-  // Load the user's figures once, the first time the panel is opened.
+  // Load the user's figures once, the first time the panel is opened. The
+  // snapshot is assembled on the server, so no rows travel to the browser.
   useEffect(() => {
-    if (!open || context !== null) return;
-    const email = user?.primaryEmailAddress?.emailAddress;
-    if (!email) return;
+    if (!open || context !== null) return undefined;
 
     let cancelled = false;
-    (async () => {
-      try {
-        const [budgets, incomes, expenses] = await Promise.all([
-          db
-            .select({
-              ...getTableColumns(Budgets),
-              totalSpend: sql`coalesce(sum(${Expenses.amount}), 0)`.mapWith(Number),
-            })
-            .from(Budgets)
-            .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-            .where(eq(Budgets.createdBy, email))
-            .groupBy(Budgets.id),
-          db.select().from(Incomes).where(eq(Incomes.createdBy, email)),
-          db
-            .select({
-              name: Expenses.name,
-              amount: Expenses.amount,
-              createdAt: Expenses.createdAt,
-            })
-            .from(Expenses)
-            .leftJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
-            .where(eq(Budgets.createdBy, email))
-            .orderBy(desc(Expenses.id)),
-        ]);
-        if (!cancelled) {
-          setContext(
-            buildFinancialContext({
-              budgetList: budgets,
-              incomeList: incomes,
-              expensesList: expenses,
-            })
-          );
-        }
-      } catch (err) {
+    callAction(getFinancialContext())
+      .then((snapshot) => {
+        if (!cancelled) setContext(snapshot || "");
+      })
+      .catch((err) => {
         console.error("Could not load context for chat:", err);
         if (!cancelled) setContext("");
-      }
-    })();
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [open, context, user?.primaryEmailAddress?.emailAddress]);
+  }, [open, context]);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();

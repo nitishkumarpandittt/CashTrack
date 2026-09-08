@@ -12,34 +12,36 @@ import {
   YAxis,
 } from "recharts";
 
+// Defined once at module level: a component created inside the parent's render
+// is a brand-new type every time, so React remounts it on each update.
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)] p-4 shadow-[var(--cash-shadow-card)]">
+      <p className="font-display text-sm font-extrabold tracking-[-0.03em] text-[var(--cash-ink)]">
+        {label}
+      </p>
+      <p className="mt-2 text-xs font-semibold text-[var(--cash-teal)]">
+        Budget: Rs.{Number(payload[1]?.value || 0).toLocaleString()}
+      </p>
+      <p className="mt-1 text-xs font-semibold text-[var(--cash-glaucous)]">
+        Spent: Rs.{Number(payload[0]?.value || 0).toLocaleString()}
+      </p>
+    </div>
+  );
+}
+
 function BarChartDashboard({ budgetList, isLoading = false }) {
   const chartData = useMemo(
     () =>
       budgetList?.map((budget) => ({
         name: budget.name,
-        totalSpend: budget.totalSpend || 0,
-        amount: budget.amount || 0,
+        totalSpend: Number(budget.totalSpend) || 0,
+        amount: Number(budget.amount) || 0,
       })) || [],
     [budgetList]
   );
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload?.length) return null;
-
-    return (
-      <div className="rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)] p-4 shadow-[var(--cash-shadow-card)]">
-        <p className="font-display text-sm font-extrabold tracking-[-0.03em] text-[var(--cash-ink)]">
-          {label}
-        </p>
-        <p className="mt-2 text-xs font-semibold text-[var(--cash-teal)]">
-          Budget: Rs.{Number(payload[1]?.value || 0).toLocaleString()}
-        </p>
-        <p className="mt-1 text-xs font-semibold text-[var(--cash-glaucous)]">
-          Spent: Rs.{Number(payload[0]?.value || 0).toLocaleString()}
-        </p>
-      </div>
-    );
-  };
 
   return (
     <section className="rounded-[28px] border border-[var(--cash-line)] bg-[var(--cash-paper)] p-5 shadow-[var(--cash-shadow-card)] md:p-7">

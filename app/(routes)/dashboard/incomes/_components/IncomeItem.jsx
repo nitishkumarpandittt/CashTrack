@@ -1,8 +1,7 @@
+"use client";
+
 import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
-import { db } from "@/utils/dbConfig";
-import { Incomes } from "@/utils/schema";
-import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -17,6 +16,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import formatNumber from "@/utils";
 
+import { deleteIncome } from "@/app/actions/incomes";
+import { callAction } from "@/utils/callAction";
+
 function IncomeItem({ budget, refreshData, totalSpend = 0 }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const amount = Number(budget?.amount) || 0;
@@ -28,18 +30,15 @@ function IncomeItem({ budget, refreshData, totalSpend = 0 }) {
     setIsDeleteDialogOpen(true);
   };
 
-  const deleteIncome = async () => {
+  const onDeleteIncome = async () => {
     try {
-      const result = await db.delete(Incomes).where(eq(Incomes.id, budget.id)).returning();
-
-      if (result) {
-        toast("Income stream deleted successfully!");
-        refreshData?.();
-        setIsDeleteDialogOpen(false);
-      }
+      await callAction(deleteIncome(budget.id));
+      toast.success("Income stream deleted successfully!");
+      refreshData?.();
+      setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting income:", error);
-      toast("Failed to delete income stream");
+      toast.error("Failed to delete income stream", { description: error.message });
     }
   };
 
@@ -64,9 +63,8 @@ function IncomeItem({ budget, refreshData, totalSpend = 0 }) {
 
       <div className="mt-8 flex items-end justify-between gap-4 border-t border-[var(--cash-line)] pt-4">
         <div className="min-w-0 flex-1">
-          {/* Share-of-income was dropped: with a single source it is always
-              100%, which tells you nothing. Coverage of actual spending is the
-              figure that changes and carries meaning. */}
+          {/* Coverage of actual spending is the figure that changes and carries
+              meaning; share-of-income is always 100% with a single source. */}
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--cash-muted)]">
             Covers spending
           </p>
@@ -110,7 +108,7 @@ function IncomeItem({ budget, refreshData, totalSpend = 0 }) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="rounded-full border-[var(--cash-line)]">Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={deleteIncome} className="rounded-full bg-rose-500 text-white hover:bg-rose-600">
+              <AlertDialogAction onClick={onDeleteIncome} className="rounded-full bg-rose-500 text-white hover:bg-rose-600">
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

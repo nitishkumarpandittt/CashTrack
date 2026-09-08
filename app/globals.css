@@ -607,3 +607,45 @@
     display: none !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Clerk sign-in / sign-up forms.                                      */
+/* AuthShell provides the frame, width and elevation, so Clerk's own    */
+/* card chrome is stripped here. Clerk injects its stylesheet at        */
+/* runtime after Tailwind's, which is why these need !important.        */
+/* ------------------------------------------------------------------ */
+.cl-rootBox {
+  width: 100% !important;
+}
+
+.cl-cardBox,
+.cl-card {
+  width: 100% !important;
+  max-width: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.cl-card {
+  padding: 0 !important;
+}
+
+.cl-footer,
+.cl-footer > * {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.cl-footerAction {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Inputs on phones: 16px stops iOS Safari zooming into the field. */
+@media (max-width: 639px) {
+  .cl-formFieldInput {
+    font-size: 16px !important;
+  }
+}

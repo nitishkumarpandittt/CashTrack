@@ -2,40 +2,34 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/utils/dbConfig";
-import { Budgets, Expenses } from "@/utils/schema";
 import { Loader, Plus } from "lucide-react";
-import moment from "moment";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
-function AddExpense({ budgetId, user, refreshData }) {
+import { addExpense } from "@/app/actions/expenses";
+import { callAction } from "@/utils/callAction";
+
+function AddExpense({ budgetId, refreshData }) {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
   const addNewExpense = async () => {
+    if (!(Number(amount) > 0)) {
+      toast.error("Enter an expense amount greater than zero");
+      return;
+    }
+
     setLoading(true);
     try {
-      const result = await db
-        .insert(Expenses)
-        .values({
-          name,
-          amount,
-          budgetId,
-          createdAt: moment().format("DD/MM/yyy"),
-        })
-        .returning({ insertedId: Budgets.id });
-
+      await callAction(addExpense({ budgetId, name, amount }));
       setAmount("");
       setName("");
-      if (result) {
-        refreshData();
-        toast("New Expense Added!");
-      }
+      refreshData();
+      toast.success("New Expense Added!");
     } catch (error) {
       console.error("Error adding expense:", error);
-      toast("Unable to add expense right now.");
+      toast.error("Unable to add expense", { description: error.message, duration: 12000 });
     } finally {
       setLoading(false);
     }
@@ -79,7 +73,7 @@ function AddExpense({ budgetId, user, refreshData }) {
       </div>
 
       <Button
-        disabled={!(name && amount) || loading}
+        disabled={!(name.trim() && amount) || loading}
         onClick={addNewExpense}
         className="mt-6 h-12 w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)]"
       >

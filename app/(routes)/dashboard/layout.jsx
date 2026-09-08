@@ -1,15 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, lazy, Suspense, useState } from "react";
-import { db } from "@/utils/dbConfig";
-import { Budgets } from "@/utils/schema";
+import { useEffect, lazy, Suspense, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { eq } from "drizzle-orm";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+import { hasBudgets } from "@/app/actions/budgets";
+import { callAction } from "@/utils/callAction";
 
 const SideNav = lazy(() => import("./_components/SideNav"));
 const DashboardHeader = lazy(() => import("./_components/DashboardHeader"));
 const MobileNav = lazy(() => import("./_components/MobileNav"));
+
+const BUDGETS_ROUTE = "/dashboard/budgets";
 
 const SideNavSkeleton = () => (
   <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.9)] backdrop-blur md:block">
@@ -51,30 +53,30 @@ const HeaderSkeleton = () => (
 );
 
 function DashboardLayout({ children }) {
-  const { user } = useUser();
+  const { isLoaded } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
-  const checkUserBudgets = useCallback(async () => {
-    if (!user?.primaryEmailAddress?.emailAddress) return;
-
-    try {
-      const result = await db
-        .select()
-        .from(Budgets)
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress));
-
-      if (result?.length === 0) {
-        router.replace("/dashboard/budgets");
-      }
-    } catch (error) {
-      console.error("Error checking budgets:", error);
-    }
-  }, [user?.primaryEmailAddress?.emailAddress, router]);
-
+  // A brand-new account is steered to the budgets page first, because every
+  // other screen is empty until at least one budget exists.
   useEffect(() => {
-    if (user) checkUserBudgets();
-  }, [user, checkUserBudgets]);
+    if (!isLoaded || pathname === BUDGETS_ROUTE) return undefined;
+
+    let cancelled = false;
+    callAction(hasBudgets())
+      .then((exists) => {
+        if (!cancelled && !exists) router.replace(BUDGETS_ROUTE);
+      })
+      .catch((error) => {
+        // The page itself reports load failures; the redirect is best-effort.
+        console.error("Error checking budgets:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, pathname, router]);
 
   const handleMenuToggle = () => setIsMobileNavOpen((open) => !open);
   const handleMobileNavClose = () => setIsMobileNavOpen(false);

@@ -1,41 +1,35 @@
 "use client";
 
-import { db } from "@/utils/dbConfig";
-import { Budgets, Expenses } from "@/utils/schema";
-import { desc, eq } from "drizzle-orm";
-import React, { useEffect, useState } from "react";
-import ExpenseListTable from "./_components/ExpenseListTable";
+import React, { useCallback, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { ReceiptText } from "lucide-react";
 
+import ExpenseListTable from "./_components/ExpenseListTable";
+import { getExpenses } from "@/app/actions/expenses";
+import { callAction } from "@/utils/callAction";
+
 function ExpensesScreen() {
   const [expensesList, setExpensesList] = useState([]);
-  const { user } = useUser();
+  const [loadError, setLoadError] = useState(null);
+  const { isLoaded } = useUser();
 
-  const getAllExpenses = async () => {
-    if (!user?.primaryEmailAddress?.emailAddress) return;
-
-    try {
-      const result = await db
-        .select({
-          id: Expenses.id,
-          name: Expenses.name,
-          amount: Expenses.amount,
-          createdAt: Expenses.createdAt,
+  const getAllExpenses = useCallback(
+    () =>
+      callAction(getExpenses())
+        .then((rows) => {
+          setExpensesList(rows);
+          setLoadError(null);
         })
-        .from(Budgets)
-        .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-        .orderBy(desc(Expenses.id));
-      setExpensesList(result);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-    }
-  };
+        .catch((error) => {
+          console.error("Error fetching expenses:", error);
+          setLoadError(error.message);
+        }),
+    []
+  );
 
   useEffect(() => {
-    if (user) getAllExpenses();
-  }, [user]);
+    if (isLoaded) getAllExpenses();
+  }, [isLoaded, getAllExpenses]);
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-6 md:px-8 md:py-10">
@@ -51,6 +45,16 @@ function ExpensesScreen() {
           Every small purchase is a signal. Keep the full picture close.
         </p>
       </div>
+
+      {loadError ? (
+        <p
+          role="alert"
+          className="mt-6 rounded-2xl border border-dashed border-[rgb(var(--cash-sand-rgb)/0.9)] bg-[rgb(var(--cash-sand-rgb)/0.18)] px-5 py-4 text-sm leading-6 text-[var(--cash-ink)]"
+        >
+          Your expenses could not be loaded. {loadError}
+        </p>
+      ) : null}
+
       <ExpenseListTable refreshData={getAllExpenses} expensesList={expensesList} />
     </div>
   );

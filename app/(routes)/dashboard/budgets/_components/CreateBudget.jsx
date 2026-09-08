@@ -17,13 +17,11 @@ import dynamic from "next/dynamic";
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/utils/dbConfig";
-import { Budgets } from "@/utils/schema";
-import { describeDbError } from "@/utils/dbErrors";
-import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { ButtonLoader } from "@/app/_components/LoadingSpinner";
 import { Plus, Sparkles } from "lucide-react";
+import { createBudget } from "@/app/actions/budgets";
+import { callAction } from "@/utils/callAction";
 
 function CreateBudget({ refreshData }) {
   const [open, setOpen] = useState(false);
@@ -32,7 +30,6 @@ function CreateBudget({ refreshData }) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
-  const { user } = useUser();
 
   const onCreateBudget = async () => {
     const trimmedName = name.trim();
@@ -45,46 +42,22 @@ function CreateBudget({ refreshData }) {
       return;
     }
 
-    // Budgets are keyed by the signed-in user's email. Without it the insert
-    // would only fail later on the NOT NULL constraint, with a message nobody
-    // can act on.
-    const createdBy = user?.primaryEmailAddress?.emailAddress;
-    if (!createdBy) {
-      toast.error("Your account has no email address on file", {
-        description: "Add an email to your account (or sign out and back in), then try again.",
-      });
-      return;
-    }
-
     try {
       setIsLoading(true);
-      const result = await db
-        .insert(Budgets)
-        .values({
-          name: trimmedName,
-          amount,
-          createdBy,
-          icon: emojiIcon,
-        })
-        .returning({ insertedId: Budgets.id });
-
-      if (result) {
-        refreshData();
-        toast.success("New Budget Created!");
-        setName("");
-        setAmount("");
-        setEmojiIcon("😀");
-        setOpen(false);
-      }
+      // The action resolves the owner from the session on the server, so the
+      // browser never handles the database or the account email.
+      await callAction(createBudget({ name: trimmedName, amount, icon: emojiIcon }));
+      refreshData();
+      toast.success("New Budget Created!");
+      setName("");
+      setAmount("");
+      setEmojiIcon("😀");
+      setOpen(false);
     } catch (error) {
       console.error("Error creating budget:", error);
       // The dialog stays open so nothing typed is lost, and the toast carries
-      // the database's own explanation: "please try again" hid every
-      // production failure behind the same sentence.
-      toast.error("Failed to create budget", {
-        description: describeDbError(error),
-        duration: 12000,
-      });
+      // the server's own explanation.
+      toast.error("Failed to create budget", { description: error.message, duration: 12000 });
     } finally {
       setIsLoading(false);
     }

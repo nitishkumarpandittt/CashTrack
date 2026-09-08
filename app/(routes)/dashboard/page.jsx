@@ -2,9 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useState, Suspense, lazy } from "react";
 import { useUser } from "@clerk/nextjs";
-import { db } from "@/utils/dbConfig";
-import { desc, eq, getTableColumns, sql } from "drizzle-orm";
-import { Budgets, Expenses, Incomes } from "@/utils/schema";
 
 const CardInfo = lazy(() => import("./_components/CardInfo"));
 const BarChartDashboard = lazy(() => import("./_components/BarChartDashboard"));
@@ -13,7 +10,10 @@ const ExpenseListTable = lazy(() => import("./expenses/_components/ExpenseListTa
 
 import { CardLoader, ChartLoader, TableLoader } from "@/app/_components/LoadingSpinner";
 import MountReveal from "@/app/_components/motion/MountReveal";
+import { Button } from "@/components/ui/button";
 import EmptyState from "./_components/EmptyState";
+import { getDashboardData } from "@/app/actions/dashboard";
+import { callAction } from "@/utils/callAction";
 
 const CardInfoSkeleton = () => (
   <div className="space-y-4">
@@ -41,67 +41,35 @@ const TableSkeleton = () => (
 const BudgetSkeleton = () => <CardLoader className="h-[170px] rounded-[24px]" />;
 
 function Dashboard() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [budgetList, setBudgetList] = useState([]);
   const [incomeList, setIncomeList] = useState([]);
   const [expensesList, setExpensesList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
-  const getBudgetList = useCallback(async () => {
-    // Bail out *and* clear the loading flag — returning while it is still true
-    // is the same "skeletons forever" trap, just reached a different way.
-    if (!user?.primaryEmailAddress?.emailAddress) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const [budgetResult, expensesResult, incomeResult] = await Promise.all([
-        db
-          .select({
-            ...getTableColumns(Budgets),
-            totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-            totalItem: sql`count(${Expenses.id})`.mapWith(Number),
-          })
-          .from(Budgets)
-          .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-          .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-          .groupBy(Budgets.id)
-          .orderBy(desc(Budgets.id)),
-        db
-          .select({
-            id: Expenses.id,
-            name: Expenses.name,
-            amount: Expenses.amount,
-            createdAt: Expenses.createdAt,
-          })
-          .from(Budgets)
-          .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-          .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-          .orderBy(desc(Expenses.id)),
-        db
-          .select()
-          .from(Incomes)
-          .where(eq(Incomes.createdBy, user.primaryEmailAddress.emailAddress))
-          .orderBy(desc(Incomes.id)),
-      ]);
-
-      setBudgetList(budgetResult);
-      setExpensesList(expensesResult);
-      setIncomeList(incomeResult);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.primaryEmailAddress?.emailAddress]);
+  // One server round trip for everything on the page. State is only touched
+  // from the promise callbacks so the mount effect stays synchronous-free.
+  const loadDashboard = useCallback(
+    () =>
+      callAction(getDashboardData())
+        .then(({ budgets, expenses, incomes }) => {
+          setBudgetList(budgets);
+          setExpensesList(expenses);
+          setIncomeList(incomes);
+          setLoadError(null);
+        })
+        .catch((error) => {
+          console.error("Error fetching dashboard data:", error);
+          setLoadError(error.message);
+        })
+        .finally(() => setIsLoading(false)),
+    []
+  );
 
   useEffect(() => {
-    if (user) getBudgetList();
-  }, [user, getBudgetList]);
-
-  const refreshData = useCallback(() => getBudgetList(), [getBudgetList]);
+    if (isLoaded) loadDashboard();
+  }, [isLoaded, loadDashboard]);
 
   const budgetItems = useMemo(() => {
     // Loading and empty are different states. Conflating them left an account
@@ -135,10 +103,10 @@ function Dashboard() {
             Your money, in focus
           </p>
           <h2 className="mt-3 font-display text-3xl font-extrabold leading-none tracking-[-0.08em] text-[var(--cash-ink)] sm:text-5xl">
-            Hi, {user?.fullName} <span aria-hidden="true">👋</span>
+            Hi, {user?.firstName || user?.fullName || "there"} <span aria-hidden="true">👋</span>
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--cash-muted)]">
-            Here's what happenning with your money, Lets Manage your expense
+            Here&apos;s what&apos;s happening with your money. Let&apos;s keep your spending on track.
           </p>
         </div>
         <div className="hidden rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-paper)] px-4 py-3 text-right shadow-sm md:block">
@@ -146,6 +114,28 @@ function Dashboard() {
           <p className="mt-1 font-display text-sm font-bold text-[var(--cash-ink)]">A clearer next move</p>
         </div>
       </MountReveal>
+
+      {loadError ? (
+        <div
+          role="alert"
+          className="mb-6 flex flex-col gap-3 rounded-[24px] border border-dashed border-[rgb(var(--cash-sand-rgb)/0.9)] bg-[rgb(var(--cash-sand-rgb)/0.18)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="font-display text-base font-extrabold tracking-[-0.03em] text-[var(--cash-ink)]">
+              Your figures could not be loaded.
+            </p>
+            <p className="mt-1 break-words text-sm leading-6 text-[var(--cash-muted)]">{loadError}</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={loadDashboard}
+            className="shrink-0 rounded-full border-[var(--cash-line)] bg-[var(--cash-paper)] hover:bg-[var(--cash-wash)]"
+          >
+            Try again
+          </Button>
+        </div>
+      ) : null}
 
       <MountReveal delay={0.06}>
         <Suspense fallback={<CardInfoSkeleton />}>
@@ -167,7 +157,7 @@ function Dashboard() {
           </MountReveal>
           <MountReveal delay={0.18}>
             <Suspense fallback={<TableSkeleton />}>
-              <ExpenseListTable expensesList={expensesList} refreshData={refreshData} />
+              <ExpenseListTable expensesList={expensesList} refreshData={loadDashboard} />
             </Suspense>
           </MountReveal>
         </div>

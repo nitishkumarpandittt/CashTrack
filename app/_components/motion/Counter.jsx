@@ -64,7 +64,6 @@ function Counter({
       tween.kill();
       el.textContent = final;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, pad, prefix, suffix, final, playOnMount]);
 
   return (

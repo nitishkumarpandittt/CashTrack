@@ -26,6 +26,12 @@ export const metadata = {
   description: "A calmer, smarter way to track your spending, budgets, and financial goals.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
@@ -40,7 +46,17 @@ export default function RootLayout({ children }) {
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/cashtrack-icon-theme.svg" />
-          <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+          {/* A blocking inline script is the only way to set the theme class
+              before the first paint. next/script's beforeInteractive queues
+              inline code until the bundle runs, which flashes the wrong theme.
+              React only warns about this tag when it has to *create* it on
+              the client, i.e. after an uncaught error forced a full re-render;
+              during normal hydration it is simply matched. */}
+          <script
+            id="cashtrack-theme-init"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: themeInitScript }}
+          />
         </head>
         <body
           className={`${manrope.variable} ${sourceSans.variable} antialiased`}

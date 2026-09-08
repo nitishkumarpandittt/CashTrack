@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 
 export const THEME_STORAGE_KEY = "cashtrack-theme";
 
@@ -16,8 +16,53 @@ export const themeInitScript = `(function(){try{var t=localStorage.getItem(${JSO
 
 const ThemeContext = createContext(null);
 
-const systemTheme = () =>
-  window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+const MEDIA_QUERY = "(prefers-color-scheme: dark)";
+
+// The preference lives outside React (localStorage + the OS media query), so
+// it is read through useSyncExternalStore rather than copied into state from
+// an effect. `memoryTheme` covers browsers where storage is unavailable: the
+// toggle still works for the session even if the choice cannot be remembered.
+let memoryTheme = null;
+const listeners = new Set();
+
+const readStored = () => {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    return stored === "dark" || stored === "light" ? stored : null;
+  } catch {
+    return null;
+  }
+};
+
+const systemTheme = () => (window.matchMedia(MEDIA_QUERY).matches ? "dark" : "light");
+
+const getSnapshot = () => memoryTheme ?? readStored() ?? systemTheme();
+
+// The server cannot know the visitor's choice, so the first client render has
+// to match the theme-agnostic HTML it hydrates.
+const getServerSnapshot = () => null;
+
+function subscribe(listener) {
+  listeners.add(listener);
+  const media = window.matchMedia(MEDIA_QUERY);
+  media.addEventListener("change", listener);
+  window.addEventListener("storage", listener);
+  return () => {
+    listeners.delete(listener);
+    media.removeEventListener("change", listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+function writeTheme(next) {
+  memoryTheme = next;
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, next);
+  } catch {
+    // The class still switches; only the preference is not remembered.
+  }
+  listeners.forEach((listener) => listener());
+}
 
 /**
  * Theme state for the whole app.
@@ -28,67 +73,21 @@ const systemTheme = () =>
  * hand colours to a non-CSS consumer (Clerk's appearance API, canvas).
  */
 function ThemeProvider({ children }) {
-  // Null until mounted. The server cannot know the visitor's choice, so the
-  // first client render has to match the theme-agnostic HTML it hydrates.
-  const [theme, setTheme] = useState(null);
+  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  useEffect(() => {
-    let stored = null;
-    try {
-      stored = localStorage.getItem(THEME_STORAGE_KEY);
-    } catch {
-      // Private mode / storage disabled — fall back to the system preference.
-    }
-    setTheme(stored === "dark" || stored === "light" ? stored : systemTheme());
-  }, []);
-
-  // Follow the OS while the visitor has not made an explicit choice.
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = (event) => {
-      let stored = null;
-      try {
-        stored = localStorage.getItem(THEME_STORAGE_KEY);
-      } catch {
-        /* ignore */
-      }
-      if (stored !== "dark" && stored !== "light") {
-        setTheme(event.matches ? "dark" : "light");
-      }
-    };
-
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
-
-  // Keep <html> in step with state. The init script already did this for the
-  // first paint; this covers every change after it.
+  // Keep <html> in step. The init script already did this for the first
+  // paint; this covers every change after it.
   useEffect(() => {
     if (theme) document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
-  const applyTheme = useCallback((next) => {
-    setTheme(next);
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
-    } catch {
-      // The class still switches; only the preference is not remembered.
-    }
-  }, []);
+  const applyTheme = useCallback((next) => writeTheme(next), []);
 
   const toggleTheme = useCallback(() => {
-    // Before mount, read the class the init script wrote rather than guessing.
-    setTheme((current) => {
-      const resolved =
-        current ?? (document.documentElement.classList.contains("dark") ? "dark" : "light");
-      const next = resolved === "dark" ? "light" : "dark";
-      try {
-        localStorage.setItem(THEME_STORAGE_KEY, next);
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    // Before the store has been read, trust the class the init script wrote.
+    const current =
+      getSnapshot() ?? (document.documentElement.classList.contains("dark") ? "dark" : "light");
+    writeTheme(current === "dark" ? "light" : "dark");
   }, []);
 
   const value = useMemo(

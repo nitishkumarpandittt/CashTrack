@@ -2,20 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/utils/dbConfig";
-import { Budgets } from "@/utils/schema";
-import { eq } from "drizzle-orm";
-import { useUser } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 
 // ~2.7MB dependency: load it lazily and only mount it once opened.
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 import { PenBox } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -23,37 +18,54 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ButtonLoader } from "@/app/_components/LoadingSpinner";
+
+import { updateBudget } from "@/app/actions/budgets";
+import { callAction } from "@/utils/callAction";
 
 function EditBudget({ budgetInfo, refreshData }) {
-  const [emojiIcon, setEmojiIcon] = useState(budgetInfo?.icon);
+  const [open, setOpen] = useState(false);
+  const [emojiIcon, setEmojiIcon] = useState(budgetInfo?.icon ?? "😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const { user } = useUser();
+  const [name, setName] = useState(budgetInfo?.name ?? "");
+  const [amount, setAmount] = useState(budgetInfo?.amount ?? "");
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (budgetInfo) {
-      setEmojiIcon(budgetInfo.icon);
-      setAmount(budgetInfo.amount);
-      setName(budgetInfo.name);
+  // The fields are re-seeded from the budget each time the dialog opens, so a
+  // refresh in the background (or an abandoned edit) never leaves stale text.
+  const onOpenChange = (nextOpen) => {
+    if (saving) return;
+    if (nextOpen) {
+      setEmojiIcon(budgetInfo?.icon ?? "😀");
+      setName(budgetInfo?.name ?? "");
+      setAmount(budgetInfo?.amount ?? "");
     }
-  }, [budgetInfo]);
+    setOpenEmojiPicker(false);
+    setOpen(nextOpen);
+  };
 
   const onUpdateBudget = async () => {
-    const result = await db
-      .update(Budgets)
-      .set({ name, amount, icon: emojiIcon })
-      .where(eq(Budgets.id, budgetInfo.id))
-      .returning();
+    if (!(Number(amount) > 0)) {
+      toast.error("Enter a budget amount greater than zero");
+      return;
+    }
 
-    if (result) {
+    try {
+      setSaving(true);
+      await callAction(updateBudget(budgetInfo.id, { name, amount, icon: emojiIcon }));
+      toast.success("Budget Updated!");
+      setOpen(false);
       refreshData();
-      toast("Budget Updated!");
+    } catch (error) {
+      console.error("Error updating budget:", error);
+      toast.error("Could not update this budget", { description: error.message, duration: 12000 });
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button className="h-10 rounded-full bg-[var(--cash-teal-solid)] px-4 text-white hover:bg-[var(--cash-onyx)]">
           <PenBox className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -100,7 +112,7 @@ function EditBudget({ budgetInfo, refreshData }) {
             <Input
               id="edit-budget-name"
               placeholder="e.g. Home Decor"
-              defaultValue={budgetInfo?.name}
+              value={name}
               onChange={(event) => setName(event.target.value)}
               className="h-12 border-[var(--cash-line)] bg-[var(--cash-mist)] focus-visible:ring-[var(--cash-teal)]"
             />
@@ -112,7 +124,7 @@ function EditBudget({ budgetInfo, refreshData }) {
               id="edit-budget-amount"
               type="number"
               min="0"
-              defaultValue={budgetInfo?.amount}
+              value={amount}
               placeholder="e.g. Rs.5000"
               onChange={(event) => setAmount(event.target.value)}
               className="h-12 border-[var(--cash-line)] bg-[var(--cash-mist)] focus-visible:ring-[var(--cash-teal)]"
@@ -121,15 +133,17 @@ function EditBudget({ budgetInfo, refreshData }) {
         </div>
 
         <DialogFooter className="mt-2 sm:justify-end">
-          <DialogClose asChild>
-            <Button
-              disabled={!(name && amount)}
-              onClick={onUpdateBudget}
-              className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
-            >
-              Save changes
-            </Button>
-          </DialogClose>
+          <Button
+            disabled={!(name.trim() && amount) || saving}
+            onClick={onUpdateBudget}
+            className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
+          >
+            {saving ? (
+              <span className="flex items-center gap-2"><ButtonLoader size="sm" /> Saving...</span>
+            ) : (
+              "Save changes"
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

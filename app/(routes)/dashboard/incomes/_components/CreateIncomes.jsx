@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -17,41 +16,57 @@ import dynamic from "next/dynamic";
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/utils/dbConfig";
-import { Incomes } from "@/utils/schema";
-import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { Plus, TrendingUp } from "lucide-react";
+import { ButtonLoader } from "@/app/_components/LoadingSpinner";
+
+import { createIncome } from "@/app/actions/incomes";
+import { callAction } from "@/utils/callAction";
 
 function CreateIncomes({ refreshData }) {
+  const [open, setOpen] = useState(false);
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
-  const { user } = useUser();
 
   const onCreateIncomes = async () => {
-    const result = await db
-      .insert(Incomes)
-      .values({
-        name,
-        amount,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
-        icon: emojiIcon,
-      })
-      .returning({ insertedId: Incomes.id });
+    const trimmedName = name.trim();
+    if (!trimmedName || !amount) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (!(Number(amount) > 0)) {
+      toast.error("Enter a monthly amount greater than zero");
+      return;
+    }
 
-    if (result) {
+    try {
+      setIsLoading(true);
+      await callAction(createIncome({ name: trimmedName, amount, icon: emojiIcon }));
       refreshData();
-      toast("New Income Source Created!");
+      toast.success("New Income Source Created!");
       setName("");
       setAmount("");
       setEmojiIcon("😀");
+      setOpen(false);
+    } catch (error) {
+      console.error("Error creating income source:", error);
+      toast.error("Failed to create income source", { description: error.message, duration: 12000 });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const onOpenChange = (nextOpen) => {
+    if (isLoading) return;
+    setOpen(nextOpen);
+    if (!nextOpen) setOpenEmojiPicker(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <button
           type="button"
@@ -131,15 +146,17 @@ function CreateIncomes({ refreshData }) {
         </div>
 
         <DialogFooter className="mt-2 sm:justify-end">
-          <DialogClose asChild>
-            <Button
-              disabled={!(name && amount)}
-              onClick={onCreateIncomes}
-              className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
-            >
+          <Button
+            disabled={!(name && amount) || isLoading}
+            onClick={onCreateIncomes}
+            className="w-full rounded-full bg-[var(--cash-teal-solid)] text-white hover:bg-[var(--cash-onyx)] sm:w-auto"
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2"><ButtonLoader size="sm" /> Creating source...</span>
+            ) : (
               <span className="flex items-center gap-2"><TrendingUp className="h-4 w-4" aria-hidden="true" /> Create income source</span>
-            </Button>
-          </DialogClose>
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

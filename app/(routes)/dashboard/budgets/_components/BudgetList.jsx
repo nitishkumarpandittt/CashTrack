@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import CreateBudget from "./CreateBudget";
-import { db } from "@/utils/dbConfig";
-import { desc, eq, getTableColumns, sql } from "drizzle-orm";
-import { Budgets, Expenses } from "@/utils/schema";
-import { describeDbError } from "@/utils/dbErrors";
+import React, { useCallback, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+
+import CreateBudget from "./CreateBudget";
 import BudgetItem from "./BudgetItem";
 import MountReveal from "@/app/_components/motion/MountReveal";
+import { Button } from "@/components/ui/button";
+import { getBudgets } from "@/app/actions/budgets";
+import { callAction } from "@/utils/callAction";
 
 function BudgetList() {
   const [budgetList, setBudgetList] = useState([]);
@@ -17,41 +16,30 @@ function BudgetList() {
   // A failed load used to render exactly like a brand-new account, so a broken
   // database connection stayed invisible until the first save failed.
   const [loadError, setLoadError] = useState(null);
-  const { user } = useUser();
+  const { isLoaded } = useUser();
 
-  const getBudgetList = async () => {
-    if (!user?.primaryEmailAddress?.emailAddress) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setLoadError(null);
-      const result = await db
-        .select({
-          ...getTableColumns(Budgets),
-          totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-          totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+  // Skeletons only cover the very first load; a refresh after creating a
+  // budget keeps the current cards on screen instead of flashing them away.
+  // State is only touched from the promise callbacks, never synchronously,
+  // which is what lets the effect below call this on mount.
+  const getBudgetList = useCallback(
+    () =>
+      callAction(getBudgets())
+        .then((rows) => {
+          setBudgetList(rows);
+          setLoadError(null);
         })
-        .from(Budgets)
-        .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-        .groupBy(Budgets.id)
-        .orderBy(desc(Budgets.id));
-
-      setBudgetList(result);
-    } catch (error) {
-      console.error("Error fetching budgets:", error);
-      setLoadError(describeDbError(error));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        .catch((error) => {
+          console.error("Error fetching budgets:", error);
+          setLoadError(error.message);
+        })
+        .finally(() => setIsLoading(false)),
+    []
+  );
 
   useEffect(() => {
-    if (user) getBudgetList();
-  }, [user]);
+    if (isLoaded) getBudgetList();
+  }, [isLoaded, getBudgetList]);
 
   return (
     <div className="mt-10">

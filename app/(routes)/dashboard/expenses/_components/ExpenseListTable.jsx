@@ -1,20 +1,27 @@
-import { db } from "@/utils/dbConfig";
-import { Expenses } from "@/utils/schema";
-import { eq } from "drizzle-orm";
+"use client";
+
 import { Trash2 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
-function ExpenseListTable({ expensesList, refreshData }) {
-  const deleteExpense = async (expense) => {
-    const result = await db
-      .delete(Expenses)
-      .where(eq(Expenses.id, expense.id))
-      .returning();
+import { deleteExpense } from "@/app/actions/expenses";
+import { callAction } from "@/utils/callAction";
 
-    if (result) {
-      toast("Expense Deleted!");
+function ExpenseListTable({ expensesList, refreshData }) {
+  const [deletingId, setDeletingId] = useState(null);
+
+  const onDelete = async (expense) => {
+    if (deletingId) return;
+    try {
+      setDeletingId(expense.id);
+      await callAction(deleteExpense(expense.id));
+      toast.success("Expense Deleted!");
       refreshData();
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      toast.error("Could not delete this expense", { description: error.message });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -53,9 +60,10 @@ function ExpenseListTable({ expensesList, refreshData }) {
                 <td className="px-4 py-4 text-right">
                   <button
                     type="button"
-                    onClick={() => deleteExpense(expense)}
+                    onClick={() => onDelete(expense)}
+                    disabled={deletingId === expense.id}
                     aria-label={`Delete ${expense.name}`}
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-rose-500 dark:text-rose-400 opacity-70 transition-colors hover:bg-rose-50 dark:hover:bg-rose-400/10 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-rose-500 dark:text-rose-400 opacity-70 transition-colors hover:bg-rose-50 dark:hover:bg-rose-400/10 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 disabled:cursor-wait disabled:opacity-40"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     Delete
@@ -79,8 +87,9 @@ function ExpenseListTable({ expensesList, refreshData }) {
             </div>
             <button
               type="button"
-              onClick={() => deleteExpense(expense)}
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 dark:text-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+              onClick={() => onDelete(expense)}
+              disabled={deletingId === expense.id}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 dark:text-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 disabled:cursor-wait disabled:opacity-40"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               Delete expense

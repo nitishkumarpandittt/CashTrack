@@ -80,8 +80,10 @@ const metrics = [
 ];
 
 function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false }) {
-  const [brief, setBrief] = useState(null);
-  const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
+  // The brief is stored together with the key of the figures it was produced
+  // for. "Loading" is then derived (figures exist, but no brief for this key
+  // yet) instead of being a second piece of state set from inside the effect.
+  const [advice, setAdvice] = useState(null);
 
   // Totals and the deterministic observations come from the same pass, so the
   // header, the metric row and the quick read can never disagree with one
@@ -93,29 +95,37 @@ function CardInfo({ budgetList, incomeList, expensesList = [], isLoading = false
   const { totalBudget, totalSpend, totalIncome, surplus, savingsRate, budgetUse } = totals;
 
   const hasFigures = totalBudget > 0 || totalIncome > 0 || totalSpend > 0;
+  const figuresKey = useMemo(
+    () =>
+      JSON.stringify([
+        totals,
+        budgetList?.length ?? 0,
+        incomeList?.length ?? 0,
+        expensesList?.length ?? 0,
+      ]),
+    [totals, budgetList, incomeList, expensesList]
+  );
 
   useEffect(() => {
     if (!hasFigures) return undefined;
 
     let cancelled = false;
-    setIsLoadingAdvice(true);
-
     getAdvancedFinancialAdvice({ budgetList, incomeList, expensesList })
       .then((result) => {
-        if (!cancelled) setBrief(result);
+        if (!cancelled) setAdvice({ key: figuresKey, brief: result });
       })
       .catch((error) => {
         console.error("Error fetching advice:", error);
-        if (!cancelled) setBrief(null);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingAdvice(false);
+        if (!cancelled) setAdvice({ key: figuresKey, brief: null });
       });
 
     return () => {
       cancelled = true;
     };
-  }, [hasFigures, budgetList, incomeList, expensesList]);
+  }, [hasFigures, figuresKey, budgetList, incomeList, expensesList]);
+
+  const brief = advice?.key === figuresKey ? advice.brief : null;
+  const isLoadingAdvice = hasFigures && advice?.key !== figuresKey;
 
   // Savings rate is only meaningful once there is income to measure against.
   const financialHealth =

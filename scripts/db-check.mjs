@@ -1,6 +1,6 @@
 // Read-only health check for the database the app points at.
 //
-//   npm run db:check                                  # NEXT_PUBLIC_DATABASE_URL from .env.local / .env
+//   npm run db:check                                  # NEXT_DATABASE_URL from .env.local / .env
 //   DATABASE_URL="postgresql://..." npm run db:check  # another database, e.g. the one Vercel is built with
 //
 // It talks to Neon over HTTP exactly the way the browser bundle does, so a
@@ -19,10 +19,10 @@ const EXPECTED = {
   expenses: ["id", "name", "amount", "budgetId", "createdAt"],
 };
 
-const url = process.env.DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL;
+const url = process.env.DATABASE_URL || process.env.NEXT_DATABASE_URL;
 if (!url) {
   console.error(
-    "No connection string. Set NEXT_PUBLIC_DATABASE_URL in .env.local, or pass DATABASE_URL=... to check another database.",
+    "No connection string. Set NEXT_DATABASE_URL in .env.local, or pass DATABASE_URL=... to check another database.",
   );
   process.exit(1);
 }
@@ -143,6 +143,6 @@ for (const [table, expected] of Object.entries(EXPECTED)) {
 
 console.log(
   problems
-    ? `\n${problems} problem(s) found. Run the fix statements in the Neon SQL editor. If you change NEXT_PUBLIC_DATABASE_URL, redeploy: it is baked into the browser bundle at build time.`
+    ? `\n${problems} problem(s) found. Run the fix statements in the Neon SQL editor. If you change NEXT_DATABASE_URL, redeploy: the server reads it when it starts, so a deployment has to be restarted or redeployed.`
     : "\nEverything looks healthy for this database.",
 );

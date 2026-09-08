@@ -6,6 +6,10 @@
  * follow the theme for free. `variables` cannot: Clerk parses them to derive
  * shades and alpha steps, which needs literal colours — hence the small map
  * below, kept in step with the two token blocks in globals.css.
+ *
+ * Clerk injects its own stylesheet at runtime, after Tailwind's, so the few
+ * rules that must beat a Clerk default (the card's own frame, width and
+ * footer gradient) live in globals.css under the `.cl-*` selectors instead.
  */
 const PALETTE = {
   light: {
@@ -14,6 +18,7 @@ const PALETTE = {
     textSecondary: "#5c6a72",
     background: "#ffffff",
     inputBackground: "#f4f8f7",
+    neutral: "#0f1620",
   },
   dark: {
     primary: "#35bdb0",
@@ -21,6 +26,7 @@ const PALETTE = {
     textSecondary: "#93a3ad",
     background: "#121b21",
     inputBackground: "#0b1216",
+    neutral: "#e6eef2",
   },
 };
 
@@ -29,6 +35,11 @@ export function authAppearance(isDark) {
   const palette = isDark ? PALETTE.dark : PALETTE.light;
 
   return {
+    layout: {
+      socialButtonsVariant: "blockButton",
+      socialButtonsPlacement: "top",
+      logoPlacement: "none",
+    },
     variables: {
       colorPrimary: palette.primary,
       colorText: palette.text,
@@ -36,23 +47,40 @@ export function authAppearance(isDark) {
       colorBackground: palette.background,
       colorInputBackground: palette.inputBackground,
       colorInputText: palette.text,
+      colorNeutral: palette.neutral,
       borderRadius: "1rem",
+      fontFamily: "inherit",
+      fontFamilyButtons: "inherit",
     },
     elements: {
       rootBox: "w-full",
-      card: "w-full border-0 bg-transparent p-0 shadow-none",
+      cardBox: "w-full",
+      card: "w-full gap-6",
+      header: "text-left",
       headerTitle:
-        "font-display text-3xl font-extrabold tracking-[-0.07em] text-[var(--cash-ink)]",
+        "font-display text-3xl font-extrabold tracking-[-0.07em] text-[var(--cash-ink)] sm:text-[2.1rem]",
       headerSubtitle: "text-sm leading-6 text-[var(--cash-muted)]",
       socialButtonsBlockButton:
-        "h-11 rounded-full border-[var(--cash-line)] bg-[var(--cash-mist)] text-[var(--cash-ink)] hover:bg-[var(--cash-wash)]",
-      formButtonPrimary:
-        "h-11 rounded-full bg-[var(--cash-teal-solid)] text-white shadow-[var(--cash-shadow-button)] hover:bg-[var(--cash-onyx)]",
-      formFieldInput:
-        "h-11 rounded-full border-[var(--cash-line)] bg-[var(--cash-mist)] text-[var(--cash-ink)] focus:border-[var(--cash-teal)] focus:ring-[var(--cash-teal)]",
-      footerActionLink: "font-semibold text-[var(--cash-teal)] hover:text-[var(--cash-ink)]",
+        "h-12 rounded-full border-[var(--cash-line)] bg-[var(--cash-mist)] text-[var(--cash-ink)] hover:bg-[var(--cash-wash)]",
+      socialButtonsBlockButtonText: "font-semibold",
       dividerLine: "bg-[var(--cash-line)]",
       dividerText: "text-[var(--cash-muted)]",
+      formFieldLabel: "text-sm font-semibold text-[var(--cash-ink)]",
+      formFieldInput:
+        "h-12 rounded-full border-[var(--cash-line)] bg-[var(--cash-mist)] px-4 text-base text-[var(--cash-ink)] focus:border-[var(--cash-teal)] focus:ring-[var(--cash-teal)] sm:text-sm",
+      formFieldInputShowPasswordButton: "text-[var(--cash-muted)]",
+      otpCodeFieldInput: "border-[var(--cash-line)] text-[var(--cash-ink)]",
+      formButtonPrimary:
+        "h-12 rounded-full bg-[var(--cash-teal-solid)] text-sm font-bold text-white shadow-[var(--cash-shadow-button)] hover:bg-[var(--cash-onyx)]",
+      footerActionText: "text-[var(--cash-muted)]",
+      footerActionLink: "font-semibold text-[var(--cash-teal)] hover:text-[var(--cash-ink)]",
+      identityPreview: "border-[var(--cash-line)] bg-[var(--cash-mist)]",
+      identityPreviewText: "text-[var(--cash-ink)]",
+      identityPreviewEditButton: "text-[var(--cash-teal)]",
+      alternativeMethodsBlockButton:
+        "rounded-full border-[var(--cash-line)] text-[var(--cash-ink)] hover:bg-[var(--cash-wash)]",
+      backLink: "text-[var(--cash-teal)]",
+      formResendCodeLink: "text-[var(--cash-teal)]",
     },
   };
 }

@@ -186,7 +186,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 
 # Database
-NEXT_PUBLIC_DATABASE_URL=postgresql://username:password@host:port/database
+NEXT_DATABASE_URL=postgresql://username:password@host:port/database
 
 # Optional: AI Features
 NEXT_PUBLIC_HUGGINGFACE_API_KEY=your_huggingface_key_here
@@ -316,7 +316,7 @@ The application is optimized for speed:
 |----------|-------------|----------|
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk public key | ✅ |
 | `CLERK_SECRET_KEY` | Clerk secret key | ✅ |
-| `NEXT_PUBLIC_DATABASE_URL` | PostgreSQL connection string | ✅ |
+| `NEXT_DATABASE_URL` | PostgreSQL connection string | ✅ |
 | `NEXT_PUBLIC_HUGGINGFACE_API_KEY` | Hugging Face API key | ❌ |
 
 ### Database Setup
@@ -336,10 +336,10 @@ The application is optimized for speed:
 
 ### Troubleshooting: budgets, incomes or expenses will not save
 
-Every read and write runs in the browser against `NEXT_PUBLIC_DATABASE_URL`, so a
-broken connection string looks like an empty account until you try to save
-something. The error toast shows the database's own message; to check the
-database itself:
+Every read and write goes through the server actions in `app/actions/*`, which
+use `NEXT_DATABASE_URL` (server-only, never sent to the browser). A broken
+connection string shows up as an error panel on each page and as the database's
+own message in the error toast. To check the database itself:
 
 ```bash
 npm run db:check
@@ -355,9 +355,10 @@ DATABASE_URL="postgresql://..." npm run db:check
 
 Two production-specific rules:
 
-- `NEXT_PUBLIC_*` variables are baked into the bundle at **build** time. After
-  adding or changing `NEXT_PUBLIC_DATABASE_URL` in your host's *Production*
-  environment, redeploy; editing the variable alone changes nothing.
+- `NEXT_DATABASE_URL` must be set in your host's *Production* environment
+  (Vercel: Settings → Environment Variables). Redeploy after adding or changing
+  it. Remove any leftover `NEXT_PUBLIC_DATABASE_URL`: it is no longer read, and
+  a `NEXT_PUBLIC_` variable would expose the password to every visitor.
 - `npm run db:push` must be run against the **same** database the deployment
   points at, otherwise the tables (or new columns) exist only locally.
 

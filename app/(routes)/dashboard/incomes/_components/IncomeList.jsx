@@ -1,59 +1,44 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import CreateIncomes from "./CreateIncomes";
-import { db } from "@/utils/dbConfig";
-import { desc, eq, sql } from "drizzle-orm";
-import { Budgets, Expenses, Incomes } from "@/utils/schema";
+import React, { useCallback, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
+
+import CreateIncomes from "./CreateIncomes";
 import IncomeItem from "./IncomeItem";
 import MountReveal from "@/app/_components/motion/MountReveal";
+import { Button } from "@/components/ui/button";
+import { getIncomes } from "@/app/actions/incomes";
+import { callAction } from "@/utils/callAction";
 
 function IncomeList() {
   const [incomeList, setIncomeList] = useState([]);
   const [totalSpend, setTotalSpend] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useUser();
+  const [loadError, setLoadError] = useState(null);
+  const { isLoaded } = useUser();
 
-  const totalIncome = useMemo(
-    () => incomeList.reduce((sum, income) => sum + (Number(income.amount) || 0), 0),
-    [incomeList]
+  // Total spend comes along so each card can say what share of actual
+  // spending it covers. State is only set from the promise callbacks so the
+  // mount effect below stays free of synchronous updates.
+  const getIncomeList = useCallback(
+    () =>
+      callAction(getIncomes())
+        .then(({ incomes, totalSpend: spend }) => {
+          setIncomeList(incomes);
+          setTotalSpend(spend || 0);
+          setLoadError(null);
+        })
+        .catch((error) => {
+          console.error("Error fetching income streams:", error);
+          setLoadError(error.message);
+        })
+        .finally(() => setIsLoading(false)),
+    []
   );
 
-  const getIncomeList = async () => {
-    if (!user?.primaryEmailAddress?.emailAddress) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      // Total spend comes along so each card can say what share of actual
-      // spending it covers, rather than showing a decorative bar.
-      const [result, spendResult] = await Promise.all([
-        db
-          .select()
-          .from(Incomes)
-          .where(eq(Incomes.createdBy, user.primaryEmailAddress.emailAddress))
-          .orderBy(desc(Incomes.id)),
-        db
-          .select({ total: sql`coalesce(sum(${Expenses.amount}), 0)`.mapWith(Number) })
-          .from(Expenses)
-          .leftJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
-          .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress)),
-      ]);
-      setIncomeList(result);
-      setTotalSpend(spendResult?.[0]?.total || 0);
-    } catch (error) {
-      console.error("Error fetching income streams:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (user) getIncomeList();
-  }, [user]);
+    if (isLoaded) getIncomeList();
+  }, [isLoaded, getIncomeList]);
 
   return (
     <div className="mt-10">
@@ -77,7 +62,29 @@ function IncomeList() {
             : null}
       </div>
 
-      {!isLoading && incomeList.length === 0 && (
+      {!isLoading && loadError && (
+        <div
+          role="alert"
+          className="mt-6 rounded-[24px] border border-dashed border-[rgb(var(--cash-sand-rgb)/0.9)] bg-[rgb(var(--cash-sand-rgb)/0.18)] px-6 py-10 text-center"
+        >
+          <p className="font-display text-lg font-extrabold tracking-[-0.05em] text-[var(--cash-ink)]">
+            Your income streams could not be loaded.
+          </p>
+          <p className="mx-auto mt-2 max-w-xl break-words text-sm leading-6 text-[var(--cash-muted)]">
+            {loadError}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={getIncomeList}
+            className="mt-5 rounded-full border-[var(--cash-line)] bg-[var(--cash-paper)] hover:bg-[var(--cash-wash)]"
+          >
+            Try again
+          </Button>
+        </div>
+      )}
+
+      {!isLoading && !loadError && incomeList.length === 0 && (
         <div className="mt-6 rounded-[24px] border border-dashed border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.6)] px-6 py-12 text-center">
           <p className="font-display text-lg font-extrabold tracking-[-0.05em] text-[var(--cash-ink)]">
             No income streams yet.
