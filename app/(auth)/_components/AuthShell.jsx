@@ -11,7 +11,7 @@ import Link from "next/link";
  */
 function AuthShell({ children }) {
   return (
-    <main className="min-h-[100dvh] bg-[var(--cash-mist)] lg:px-6 lg:py-6">
+    <main className="auth-shell min-h-[100dvh] bg-[var(--cash-mist)] lg:px-6 lg:py-6">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1280px] flex-col overflow-hidden bg-[var(--cash-paper)] lg:grid lg:min-h-[calc(100dvh-3rem)] lg:grid-cols-[0.92fr_1.08fr] lg:rounded-[32px] lg:border lg:border-[var(--cash-line)] lg:shadow-[var(--cash-shadow-preview)]">
         <section className="relative overflow-hidden bg-[var(--cash-onyx)] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white sm:px-8 sm:pb-10 lg:flex lg:flex-col lg:justify-between lg:p-12">
           <div

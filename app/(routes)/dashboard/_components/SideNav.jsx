@@ -124,15 +124,22 @@ function SideNav() {
       </div>
 
       <div className="mt-5 flex items-center gap-3 border-t border-[var(--cash-line)] pt-5">
-        <UserButton
-          afterSignOutUrl="/"
-          appearance={{ elements: { ...userButtonElements, avatarBox: "h-9 w-9" } }}
-        />
-        <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--cash-muted)]">
+        {/* The Clerk button must keep its natural width so the text beside it
+            gets the rest of the row; the name truncates only as a last resort. */}
+        <div className="shrink-0">
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{ elements: { ...userButtonElements, avatarBox: "h-9 w-9" } }}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--cash-muted)]">
             Account
           </p>
-          <p className="truncate text-sm font-semibold text-[var(--cash-ink)]">
+          <p
+            className="truncate text-sm font-semibold text-[var(--cash-ink)]"
+            title={user?.fullName || user?.primaryEmailAddress?.emailAddress || undefined}
+          >
             {user?.fullName || user?.primaryEmailAddress?.emailAddress || "Your profile"}
           </p>
         </div>

@@ -614,12 +614,12 @@
 /* card chrome is stripped here. Clerk injects its stylesheet at        */
 /* runtime after Tailwind's, which is why these need !important.        */
 /* ------------------------------------------------------------------ */
-.cl-rootBox {
+.auth-shell .cl-rootBox {
   width: 100% !important;
 }
 
-.cl-cardBox,
-.cl-card {
+.auth-shell .cl-cardBox,
+.auth-shell .cl-card {
   width: 100% !important;
   max-width: none !important;
   border: 0 !important;
@@ -628,41 +628,41 @@
   box-shadow: none !important;
 }
 
-.cl-card {
+.auth-shell .cl-card {
   padding: 0 !important;
 }
 
-.cl-footer,
-.cl-footer > * {
+.auth-shell .cl-footer,
+.auth-shell .cl-footer > * {
   background: transparent !important;
   background-image: none !important;
 }
 
-.cl-footerAction {
+.auth-shell .cl-footerAction {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 
 /* Inputs on phones: 16px stops iOS Safari zooming into the field. */
 @media (max-width: 639px) {
-  .cl-formFieldInput {
+  .auth-shell .cl-formFieldInput {
     font-size: 16px !important;
   }
 }
 
 /* The display face's negative tracking lets the first glyph overhang its box;
    Clerk clips that with overflow:hidden on the card, so let it breathe. */
-.cl-rootBox,
-.cl-cardBox,
-.cl-card,
-.cl-header {
+.auth-shell .cl-rootBox,
+.auth-shell .cl-cardBox,
+.auth-shell .cl-card,
+.auth-shell .cl-header {
   overflow: visible !important;
 }
 
-.cl-card {
+.auth-shell .cl-card {
   margin: 0 !important;
 }
 
-.cl-headerTitle {
+.auth-shell .cl-headerTitle {
   padding-left: 0.08em;
 }
