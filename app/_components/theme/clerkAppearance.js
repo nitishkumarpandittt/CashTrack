@@ -7,9 +7,11 @@
  * shades and alpha steps, which needs literal colours — hence the small map
  * below, kept in step with the two token blocks in globals.css.
  *
- * Clerk injects its own stylesheet at runtime, after Tailwind's, so the few
- * rules that must beat a Clerk default (the card's own frame, width and
- * footer gradient) live in globals.css under the `.cl-*` selectors instead.
+ * Clerk injects its own stylesheet at runtime, after Tailwind's, so anything
+ * that has to beat a Clerk default of equal specificity is written with
+ * Tailwind's `!` prefix. This is Clerk's supported styling path: it targets
+ * elements by name rather than by their internal DOM structure, so a Clerk
+ * update cannot silently break the layout the way `.cl-*` selectors could.
  */
 const PALETTE = {
   light: {
@@ -29,6 +31,12 @@ const PALETTE = {
     neutral: "#e6eef2",
   },
 };
+
+// AuthShell supplies the frame, width, padding and elevation, so Clerk's own
+// card chrome is stripped. `overflow-visible` matters because the display
+// face's negative tracking lets the first glyph overhang its box, which
+// Clerk's default `overflow: hidden` would clip.
+const BARE_CARD = "!w-full !max-w-none !rounded-none !border-0 !bg-transparent !shadow-none";
 
 /** Appearance for the full-page SignIn / SignUp forms. */
 export function authAppearance(isDark) {
@@ -53,34 +61,37 @@ export function authAppearance(isDark) {
       fontFamilyButtons: "inherit",
     },
     elements: {
-      rootBox: "w-full",
-      cardBox: "w-full",
-      card: "w-full gap-6",
-      header: "text-left",
+      rootBox: "!w-full !overflow-visible",
+      cardBox: `${BARE_CARD} !overflow-visible`,
+      card: `${BARE_CARD} !m-0 !gap-6 !p-0 !overflow-visible`,
+      header: "text-left !overflow-visible",
       headerTitle:
-        "font-display text-3xl font-extrabold tracking-[-0.07em] text-[var(--cash-ink)] sm:text-[2.1rem]",
-      headerSubtitle: "text-sm leading-6 text-[var(--cash-muted)]",
+        "font-display !text-3xl !font-extrabold !tracking-[-0.07em] !text-[var(--cash-ink)] !pl-[0.08em] sm:!text-[2.1rem]",
+      headerSubtitle: "!text-sm !leading-6 !text-[var(--cash-muted)]",
       socialButtonsBlockButton:
-        "h-12 rounded-full border-[var(--cash-line)] bg-[var(--cash-mist)] text-[var(--cash-ink)] hover:bg-[var(--cash-wash)]",
-      socialButtonsBlockButtonText: "font-semibold",
-      dividerLine: "bg-[var(--cash-line)]",
-      dividerText: "text-[var(--cash-muted)]",
-      formFieldLabel: "text-sm font-semibold text-[var(--cash-ink)]",
+        "!h-12 !rounded-full !border-[var(--cash-line)] !bg-[var(--cash-mist)] !text-[var(--cash-ink)] hover:!bg-[var(--cash-wash)]",
+      socialButtonsBlockButtonText: "!font-semibold",
+      dividerLine: "!bg-[var(--cash-line)]",
+      dividerText: "!text-[var(--cash-muted)]",
+      formFieldLabel: "!text-sm !font-semibold !text-[var(--cash-ink)]",
+      // 16px on phones stops iOS Safari zooming into the field on focus.
       formFieldInput:
-        "h-12 rounded-full border-[var(--cash-line)] bg-[var(--cash-mist)] px-4 text-base text-[var(--cash-ink)] focus:border-[var(--cash-teal)] focus:ring-[var(--cash-teal)] sm:text-sm",
-      formFieldInputShowPasswordButton: "text-[var(--cash-muted)]",
-      otpCodeFieldInput: "border-[var(--cash-line)] text-[var(--cash-ink)]",
+        "!h-12 !rounded-full !border-[var(--cash-line)] !bg-[var(--cash-mist)] !px-4 !text-base !text-[var(--cash-ink)] focus:!border-[var(--cash-teal)] focus:!ring-[var(--cash-teal)] sm:!text-sm",
+      formFieldInputShowPasswordButton: "!text-[var(--cash-muted)]",
+      otpCodeFieldInput: "!border-[var(--cash-line)] !text-[var(--cash-ink)]",
       formButtonPrimary:
-        "h-12 rounded-full bg-[var(--cash-teal-solid)] text-sm font-bold text-white shadow-[var(--cash-shadow-button)] hover:bg-[var(--cash-onyx)]",
-      footerActionText: "text-[var(--cash-muted)]",
-      footerActionLink: "font-semibold text-[var(--cash-teal)] hover:text-[var(--cash-ink)]",
-      identityPreview: "border-[var(--cash-line)] bg-[var(--cash-mist)]",
-      identityPreviewText: "text-[var(--cash-ink)]",
-      identityPreviewEditButton: "text-[var(--cash-teal)]",
+        "!h-12 !rounded-full !bg-[var(--cash-teal-solid)] !text-sm !font-bold !text-white !shadow-[var(--cash-shadow-button)] hover:!bg-[var(--cash-onyx)]",
+      footer: "!bg-transparent !bg-none",
+      footerAction: "!bg-transparent !bg-none !px-0",
+      footerActionText: "!text-[var(--cash-muted)]",
+      footerActionLink: "!font-semibold !text-[var(--cash-teal)] hover:!text-[var(--cash-ink)]",
+      identityPreview: "!border-[var(--cash-line)] !bg-[var(--cash-mist)]",
+      identityPreviewText: "!text-[var(--cash-ink)]",
+      identityPreviewEditButton: "!text-[var(--cash-teal)]",
       alternativeMethodsBlockButton:
-        "rounded-full border-[var(--cash-line)] text-[var(--cash-ink)] hover:bg-[var(--cash-wash)]",
-      backLink: "text-[var(--cash-teal)]",
-      formResendCodeLink: "text-[var(--cash-teal)]",
+        "!rounded-full !border-[var(--cash-line)] !text-[var(--cash-ink)] hover:!bg-[var(--cash-wash)]",
+      backLink: "!text-[var(--cash-teal)]",
+      formResendCodeLink: "!text-[var(--cash-teal)]",
     },
   };
 }

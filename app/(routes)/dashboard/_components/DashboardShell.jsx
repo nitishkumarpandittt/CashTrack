@@ -7,9 +7,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { hasBudgets } from "@/app/actions/budgets";
 import { callAction } from "@/utils/callAction";
 
-const SideNav = lazy(() => import("./_components/SideNav"));
-const DashboardHeader = lazy(() => import("./_components/DashboardHeader"));
-const MobileNav = lazy(() => import("./_components/MobileNav"));
+const SideNav = lazy(() => import("./SideNav"));
+const DashboardHeader = lazy(() => import("./DashboardHeader"));
+const MobileNav = lazy(() => import("./MobileNav"));
 
 const BUDGETS_ROUTE = "/dashboard/budgets";
 

@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+
 import {
   MISSING_KEY_MESSAGE,
   describeGeminiError,
@@ -48,6 +50,13 @@ function normalise(raw) {
 }
 
 export async function POST(request) {
+  // Guarded here rather than in middleware: this route spends against the
+  // Gemini key, so it verifies the session where the work happens.
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ error: "Your session has expired. Sign in again." }, { status: 401 });
+  }
+
   let payload;
   try {
     payload = await request.json();
