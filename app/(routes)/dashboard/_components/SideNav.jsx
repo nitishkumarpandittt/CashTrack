@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import {
   CircleDollarSign,
@@ -16,12 +16,10 @@ import {
 } from "lucide-react";
 
 import { userButtonElements } from "@/app/_components/theme/clerkAppearance";
-import AiChat from "./AiChat";
 
 function SideNav() {
   const path = usePathname();
   const { user } = useUser();
-  const [chatOpen, setChatOpen] = useState(false);
   const menuList = useMemo(
     () => [
       { id: 1, name: "Home", icon: Home, path: "/" },
@@ -29,7 +27,8 @@ function SideNav() {
       { id: 3, name: "Incomes", icon: CircleDollarSign, path: "/dashboard/incomes" },
       { id: 4, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
       { id: 5, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
-      { id: 6, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
+      { id: 6, name: "Assistant", icon: Sparkles, path: "/dashboard/assistant" },
+      { id: 7, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
     ],
     []
   );
@@ -66,9 +65,7 @@ function SideNav() {
         </span>
       </Link>
 
-      {/* The chat panel overlays exactly this region: below the logo header,
-          above the account footer. */}
-      <div className="relative flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         <nav className="mt-8 flex-1 space-y-1.5" aria-label="Dashboard navigation">
           {menuList.map((menu) => {
             const isActive = isActivePath(menu.path);
@@ -102,25 +99,6 @@ function SideNav() {
             );
           })}
         </nav>
-
-        {/* Was a static blurb; it now opens the assistant. */}
-        <button
-          type="button"
-          onClick={() => setChatOpen(true)}
-          className="group w-full rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)] p-4 text-left transition-colors hover:border-[rgb(var(--cash-teal-rgb)/0.4)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)]"
-        >
-          <span className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[var(--cash-teal)]" aria-hidden="true" />
-            <span className="font-display text-sm font-bold tracking-[-0.03em] text-[var(--cash-ink)]">
-              CashTrack AI
-            </span>
-          </span>
-          <span className="mt-1 block text-xs leading-5 text-[var(--cash-muted)]">
-            Ask about your budgets, spending or savings.
-          </span>
-        </button>
-
-        <AiChat open={chatOpen} onClose={() => setChatOpen(false)} />
       </div>
 
       <div className="mt-5 flex items-center gap-3 border-t border-[var(--cash-line)] pt-5">

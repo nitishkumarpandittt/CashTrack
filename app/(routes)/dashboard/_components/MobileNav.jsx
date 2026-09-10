@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,11 +15,8 @@ import {
   X,
 } from "lucide-react";
 
-import AiChat from "./AiChat";
-
 function MobileNav({ isOpen, onClose }) {
   const path = usePathname();
-  const [chatOpen, setChatOpen] = useState(false);
   const menuList = useMemo(
     () => [
       { id: 1, name: "Home", icon: Home, path: "/" },
@@ -27,7 +24,8 @@ function MobileNav({ isOpen, onClose }) {
       { id: 3, name: "Incomes", icon: CircleDollarSign, path: "/dashboard/incomes" },
       { id: 4, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
       { id: 5, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
-      { id: 6, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
+      { id: 6, name: "Assistant", icon: Sparkles, path: "/dashboard/assistant" },
+      { id: 7, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
     ],
     []
   );
@@ -35,10 +33,8 @@ function MobileNav({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) return undefined;
 
-    // While the chat sheet is on top, Escape belongs to it (the sheet has its
-    // own handler); closing the drawer too would unmount the sheet mid-exit.
     const handleEscape = (event) => {
-      if (event.key === "Escape" && !chatOpen) onClose();
+      if (event.key === "Escape") onClose();
     };
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -48,7 +44,7 @@ function MobileNav({ isOpen, onClose }) {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isOpen, onClose, chatOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -126,26 +122,7 @@ function MobileNav({ isOpen, onClose }) {
             );
           })}
         </nav>
-
-        {/* Same assistant entry as the desktop sidebar. */}
-        <button
-          type="button"
-          onClick={() => setChatOpen(true)}
-          className="group mt-auto w-full rounded-2xl border border-[var(--cash-line)] bg-[var(--cash-mist)] p-4 text-left transition-colors hover:border-[rgb(var(--cash-teal-rgb)/0.4)] hover:bg-[var(--cash-wash)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cash-teal)]"
-        >
-          <span className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[var(--cash-teal)]" aria-hidden="true" />
-            <span className="font-display text-sm font-bold tracking-[-0.03em] text-[var(--cash-ink)]">
-              CashTrack AI
-            </span>
-          </span>
-          <span className="mt-1 block text-xs leading-5 text-[var(--cash-muted)]">
-            Ask about your budgets, spending or savings.
-          </span>
-        </button>
       </aside>
-
-      <AiChat open={chatOpen} onClose={() => setChatOpen(false)} variant="sheet" />
     </div>
   );
 }

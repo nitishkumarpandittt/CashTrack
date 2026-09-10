@@ -17,6 +17,9 @@ const EXPECTED = {
   budgets: ["id", "name", "amount", "icon", "createdBy"],
   incomes: ["id", "name", "amount", "icon", "createdBy"],
   expenses: ["id", "name", "amount", "budgetId", "createdAt"],
+  chats: ["id", "title", "createdBy", "createdAt", "updatedAt"],
+  chat_messages: ["id", "chatId", "role", "content", "createdAt"],
+  chat_attachments: ["id", "messageId", "name", "mimeType", "kind", "size", "data", "createdAt"],
 };
 
 const url = process.env.DATABASE_URL || process.env.NEXT_DATABASE_URL;
@@ -68,7 +71,7 @@ if (readOnly === "on") {
 const columns = await sql`
   select table_name, column_name
   from information_schema.columns
-  where table_schema = 'public' and table_name in ('budgets', 'incomes', 'expenses')
+  where table_schema = 'public' and table_name in ('budgets', 'incomes', 'expenses', 'chats', 'chat_messages', 'chat_attachments')
 `;
 const byTable = new Map();
 for (const row of columns) {

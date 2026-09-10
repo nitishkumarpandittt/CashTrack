@@ -13,6 +13,7 @@ const pageTitles = {
   "/dashboard/incomes": "Income streams",
   "/dashboard/budgets": "Budgets",
   "/dashboard/expenses": "Expenses",
+  "/dashboard/assistant": "CashTrack AI",
   "/dashboard/upgrade": "Upgrade your plan",
 };
 
@@ -20,6 +21,7 @@ function DashboardHeader({ onMenuToggle, isMobileNavOpen }) {
   const pathname = usePathname();
   const pageTitle =
     pageTitles[pathname] ||
+    (pathname.startsWith("/dashboard/assistant") ? "CashTrack AI" : null) ||
     (pathname.startsWith("/dashboard/expenses/") ? "Budget details" : "Workspace");
 
   return (

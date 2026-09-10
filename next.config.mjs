@@ -10,6 +10,10 @@ const nextConfig = {
 
     // Minimal experimental features for speed
     experimental: {
+        // Chat attachments (images, PDFs) travel through the sendMessage server
+        // action as base64; the default 1 MB body limit would reject a single
+        // receipt photo. Sized above MAX_TOTAL_BYTES in utils/attachments.js.
+        serverActions: { bodySizeLimit: '16mb' },
         // Only essential optimizations
         optimizePackageImports: ['lucide-react'],
         // Enable faster builds

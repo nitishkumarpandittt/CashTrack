@@ -2,32 +2,62 @@
 // file itself: those may only export async functions, and this exports a class
 // and a couple of helpers.
 
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { describeDbError } from "@/utils/dbErrors";
 
 /** A failure with a message that is safe and useful to show the user as-is. */
 export class ActionError extends Error {}
 
 /**
- * The signed-in user's email, which is what every row is keyed on. Resolved
- * on the server from the Clerk session, so a caller cannot read or write
- * another account's rows by sending a different address.
+ * Clerk profile per user id, remembered for a while on this server instance.
+ * `auth()` verifies the session token locally in a millisecond or two, but
+ * `currentUser()` is a round trip to Clerk's API on every call; with several
+ * actions per page that was hundreds of milliseconds each, every time.
  */
-export async function requireProfile() {
-  const user = await currentUser();
-  if (!user) throw new ActionError("Your session has expired. Sign in again.");
+const PROFILE_TTL_MS = 10 * 60 * 1000;
+const profiles = new Map();
 
-  const email =
+function pickEmail(user) {
+  return (
     user.primaryEmailAddress?.emailAddress ??
     user.emailAddresses?.find((entry) => entry.id === user.primaryEmailAddressId)?.emailAddress ??
-    user.emailAddresses?.[0]?.emailAddress;
+    user.emailAddresses?.[0]?.emailAddress ??
+    ""
+  );
+}
+
+/**
+ * The signed-in user's email, which is what every row is keyed on, plus their
+ * first name. Resolved on the server from the Clerk session, so a caller
+ * cannot read or write another account's rows by sending a different address.
+ */
+export async function requireProfile() {
+  const { userId, sessionClaims } = await auth();
+  if (!userId) throw new ActionError("Your session has expired. Sign in again.");
+
+  const cached = profiles.get(userId);
+  if (cached && cached.expires > Date.now()) return cached;
+
+  // A session token customised in the Clerk dashboard to carry the email
+  // avoids the API call entirely; otherwise fetch the user once and remember.
+  let email = typeof sessionClaims?.email === "string" ? sessionClaims.email : "";
+  let firstName = typeof sessionClaims?.firstName === "string" ? sessionClaims.firstName : "";
+  if (!email) {
+    const user = await currentUser();
+    if (!user) throw new ActionError("Your session has expired. Sign in again.");
+    email = pickEmail(user);
+    firstName = user.firstName?.trim() || "";
+  }
 
   if (!email) {
     throw new ActionError(
       "Your account has no email address on file. Add one to your account, then try again."
     );
   }
-  return { email, firstName: user.firstName?.trim() || "" };
+
+  const profile = { email, firstName, expires: Date.now() + PROFILE_TTL_MS };
+  profiles.set(userId, profile);
+  return profile;
 }
 
 export async function requireEmail() {

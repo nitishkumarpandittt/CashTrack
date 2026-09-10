@@ -13,6 +13,11 @@ const MobileNav = lazy(() => import("./_components/MobileNav"));
 
 const BUDGETS_ROUTE = "/dashboard/budgets";
 
+// Once an account is known to have budgets, the redirect can never apply
+// again in this tab, so the check runs at most once per session instead of
+// on every navigation.
+let knownToHaveBudgets = false;
+
 const SideNavSkeleton = () => (
   <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[var(--cash-line)] bg-[rgb(var(--cash-paper-rgb)/0.9)] backdrop-blur md:block">
     <div className="flex h-full min-h-screen flex-col p-5">
@@ -61,11 +66,14 @@ function DashboardLayout({ children }) {
   // A brand-new account is steered to the budgets page first, because every
   // other screen is empty until at least one budget exists.
   useEffect(() => {
-    if (!isLoaded || pathname === BUDGETS_ROUTE) return undefined;
+    if (!isLoaded || knownToHaveBudgets || pathname === BUDGETS_ROUTE) return undefined;
+    // The assistant is useful before any budget exists; no need to bounce.
+    if (pathname.startsWith("/dashboard/assistant")) return undefined;
 
     let cancelled = false;
     callAction(hasBudgets())
       .then((exists) => {
+        if (exists) knownToHaveBudgets = true;
         if (!cancelled && !exists) router.replace(BUDGETS_ROUTE);
       })
       .catch((error) => {
@@ -81,8 +89,13 @@ function DashboardLayout({ children }) {
   const handleMenuToggle = () => setIsMobileNavOpen((open) => !open);
   const handleMobileNavClose = () => setIsMobileNavOpen(false);
 
+  // The assistant scrolls inside its own panes, so its route pins the frame
+  // to the viewport and lets the header take whatever height it needs. Every
+  // other page keeps the ordinary document scroll.
+  const fillsViewport = pathname.startsWith("/dashboard/assistant");
+
   return (
-    <div className="min-h-screen bg-[var(--cash-mist)] text-[var(--cash-ink)]">
+    <div className="min-h-[100dvh] bg-[var(--cash-mist)] text-[var(--cash-ink)]">
       <Suspense fallback={<SideNavSkeleton />}>
         <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 md:block">
           <SideNav />
@@ -93,14 +106,24 @@ function DashboardLayout({ children }) {
         <MobileNav isOpen={isMobileNavOpen} onClose={handleMobileNavClose} />
       </Suspense>
 
-      <div className="min-h-screen md:pl-72">
+      {/* Header plus main always add up to exactly one viewport: the column
+          is viewport-tall and main takes whatever the header leaves, with no
+          hardcoded header height anywhere. Ordinary pages grow past that and
+          scroll the document; the assistant is pinned and scrolls inside. */}
+      <div
+        className={`flex flex-col md:pl-72 ${
+          fillsViewport ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"
+        }`}
+      >
         <Suspense fallback={<HeaderSkeleton />}>
           <DashboardHeader
             onMenuToggle={handleMenuToggle}
             isMobileNavOpen={isMobileNavOpen}
           />
         </Suspense>
-        <main className="min-h-[calc(100vh-76px)]">{children}</main>
+        <main className={`flex flex-1 flex-col ${fillsViewport ? "min-h-0" : ""}`}>
+          {children}
+        </main>
       </div>
     </div>
   );
