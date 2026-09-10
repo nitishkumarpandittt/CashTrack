@@ -4,6 +4,7 @@ import {
   generateContent,
   hasGeminiKey,
 } from "@/utils/geminiClient";
+import { CHAT_SYSTEM_PROMPT } from "@/utils/chatPrompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,19 +14,8 @@ export const dynamic = "force-dynamic";
  *
  * Runs server-side on purpose: GEMINI_API_KEY is never exposed to the browser.
  * The route is behind Clerk (see proxy.js), so only signed-in users can spend
- * against the key.
+ * against the key. The coaching instructions live in utils/chatPrompt.js.
  */
-const SYSTEM_PROMPT = `You are CashTrack's in-app financial assistant. You help one user understand their own money.
-
-Rules:
-- Answer using ONLY the figures in the FINANCIAL CONTEXT below. Never invent or estimate a number that is not there.
-- Every figure in the context is already computed for you. Quote those figures rather than doing your own arithmetic.
-- If the context does not contain what is needed, say so plainly and name what the user should add (a budget, an income source, some expenses).
-- Amounts are Indian rupees. Write them like Rs.1,250.
-- Be specific and concrete. Cite the actual budget names, categories and amounts involved rather than talking in generalities.
-- Default to a short answer of three to five sentences. If the question genuinely calls for a breakdown, use a few "- " bullets. Use **bold** for figures worth highlighting.
-- You explain the user's own data and general budgeting principles. You are not a licensed financial adviser, so do not recommend specific investments, funds, stocks or products. If asked for that, say it is outside what you can advise on and redirect to what their own numbers show.
-- If a question is not about their finances or this app, say briefly that it is outside what you can help with here.`;
 
 /**
  * The panel's transcript, as turns Gemini will accept: `assistant` becomes
@@ -65,12 +55,14 @@ export async function POST(request) {
 
   try {
     const reply = await generateContent({
-      system: `${SYSTEM_PROMPT}\n\nFINANCIAL CONTEXT\n${context || "(no data recorded yet)"}`,
+      system: `${CHAT_SYSTEM_PROMPT}\n\nFINANCIAL CONTEXT\n${context || "(no data recorded yet)"}`,
       contents: [
         ...toGeminiHistory(history),
         { role: "user", parts: [{ text: question.slice(0, 2000) }] },
       ],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 900 },
+      // Plans with an allocation and a couple of follow-up questions need more
+      // room than the old three-sentence answers did.
+      generationConfig: { temperature: 0.5, maxOutputTokens: 1500 },
     });
 
     return Response.json({ reply });

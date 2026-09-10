@@ -13,7 +13,7 @@ export class ActionError extends Error {}
  * on the server from the Clerk session, so a caller cannot read or write
  * another account's rows by sending a different address.
  */
-export async function requireEmail() {
+export async function requireProfile() {
   const user = await currentUser();
   if (!user) throw new ActionError("Your session has expired. Sign in again.");
 
@@ -27,7 +27,11 @@ export async function requireEmail() {
       "Your account has no email address on file. Add one to your account, then try again."
     );
   }
-  return email;
+  return { email, firstName: user.firstName?.trim() || "" };
+}
+
+export async function requireEmail() {
+  return (await requireProfile()).email;
 }
 
 /**

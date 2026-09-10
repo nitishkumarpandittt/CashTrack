@@ -7,9 +7,10 @@ import { getFinancialContext } from "@/app/actions/dashboard";
 import { callAction } from "@/utils/callAction";
 
 const STARTERS = [
-  "Where is most of my money going?",
-  "Am I saving enough?",
+  "Where should I invest my surplus?",
+  "Do I have enough of an emergency fund?",
   "Which budget should I worry about?",
+  "Explain SIPs and index funds simply",
 ];
 
 /** Bold runs (**text**) inside a single line, without dangerouslySetInnerHTML. */
@@ -29,22 +30,27 @@ function renderInline(text) {
 }
 
 /**
- * Answers arrive as light markdown (bold, `-`/`*` bullets). Rendering the raw
- * asterisks looks broken, so parse just those two constructs into paragraphs
- * and lists; anything else stays plain text.
+ * Answers arrive as light markdown: bold, `-`/`*` bullets, `1.` steps and the
+ * odd `#` heading. Rendering the raw symbols looks broken, so parse those few
+ * constructs into paragraphs and lists; anything else stays plain text.
  */
 function AssistantText({ text }) {
   const blocks = [];
   let list = null;
 
-  for (const line of text.split("\n")) {
+  for (const rawLine of text.split("\n")) {
+    const line = rawLine.replace(/^\s*#{1,6}\s+(.*)$/, "**$1**");
     const bullet = line.match(/^\s*[*-]\s+(.*)/);
-    if (bullet) {
-      if (!list) {
-        list = [];
-        blocks.push({ type: "list", items: list });
+    const step = line.match(/^\s*(\d+)[.)]\s+(.*)/);
+    const item = bullet ? { text: bullet[1] } : step ? { text: step[2], n: step[1] } : null;
+    const kind = bullet ? "ul" : step ? "ol" : null;
+
+    if (item) {
+      if (!list || list.kind !== kind) {
+        list = { kind, items: [] };
+        blocks.push({ type: "list", ...list });
       }
-      list.push(bullet[1]);
+      list.items.push(item);
     } else {
       list = null;
       if (line.trim()) blocks.push({ type: "p", text: line });
@@ -55,17 +61,30 @@ function AssistantText({ text }) {
     <div className="space-y-2">
       {blocks.map((block, i) =>
         block.type === "list" ? (
-          <ul key={i} className="space-y-1.5">
-            {block.items.map((item, j) => (
-              <li key={j} className="flex gap-2">
-                <span
-                  className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-[var(--cash-teal)]"
-                  aria-hidden="true"
-                />
-                <span>{renderInline(item)}</span>
-              </li>
-            ))}
-          </ul>
+          block.kind === "ol" ? (
+            <ol key={i} className="space-y-1.5">
+              {block.items.map((entry, j) => (
+                <li key={j} className="flex gap-2">
+                  <span className="w-4 shrink-0 text-right font-display text-xs font-bold leading-5 text-[var(--cash-teal)]">
+                    {entry.n}.
+                  </span>
+                  <span className="min-w-0">{renderInline(entry.text)}</span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ul key={i} className="space-y-1.5">
+              {block.items.map((entry, j) => (
+                <li key={j} className="flex gap-2">
+                  <span
+                    className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-[var(--cash-teal)]"
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0">{renderInline(entry.text)}</span>
+                </li>
+              ))}
+            </ul>
+          )
         ) : (
           <p key={i}>{renderInline(block.text)}</p>
         )

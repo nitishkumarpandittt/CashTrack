@@ -5,7 +5,7 @@ import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses, Incomes } from "@/utils/schema";
 import { buildFinancialContext } from "@/utils/financialContext";
-import { requireEmail, run } from "./_shared";
+import { requireEmail, requireProfile, run } from "./_shared";
 
 async function loadEverything(email) {
   const [budgets, expenses, incomes] = await Promise.all([
@@ -48,11 +48,13 @@ export async function getDashboardData() {
  */
 export async function getFinancialContext() {
   return run(async () => {
-    const { budgets, expenses, incomes } = await loadEverything(await requireEmail());
+    const { email, firstName } = await requireProfile();
+    const { budgets, expenses, incomes } = await loadEverything(email);
     return buildFinancialContext({
       budgetList: budgets,
       incomeList: incomes,
       expensesList: expenses,
+      userName: firstName,
     });
   });
 }

@@ -24,11 +24,16 @@ export function buildFinancialContext({
   budgetList = [],
   incomeList = [],
   expensesList = [],
+  userName = "",
 } = {}) {
   const { totals, insights } = deriveInsights({ budgetList, incomeList, expensesList });
   const { totalBudget, totalSpend, totalIncome, surplus, savingsRate, budgetUse } = totals;
 
-  const lines = [
+  const lines = [];
+
+  if (userName) lines.push(`USER: ${userName}`, "");
+
+  lines.push(
     "TOTALS",
     `- Total income: ${rupees(totalIncome)}`,
     `- Total budgeted: ${rupees(totalBudget)}`,
@@ -39,10 +44,37 @@ export function buildFinancialContext({
       : `- Savings rate: ${pct(savingsRate)} (the common benchmark is 20%)`,
     `- Budget utilisation: ${pct(budgetUse)} of the total budget has been spent`,
     `- Unallocated income (income minus budgeted): ${rupees(totalIncome - totalBudget)}`,
-    "",
-    "BUDGETS (name | limit | spent | remaining | used)",
-  ];
+    ""
+  );
 
+  // Reference figures for planning questions, so the coach can size an
+  // emergency fund or a savings target without doing arithmetic itself. The
+  // app has no calendar, so "a month" is the spend recorded so far and the
+  // caveat travels with the figures.
+  lines.push("PLANNING FIGURES (derived from the totals above)");
+  if (totalSpend > 0) {
+    lines.push(
+      `- Emergency fund target: ${rupees(totalSpend * 3)} (3 months) to ${rupees(
+        totalSpend * 6
+      )} (6 months), treating the recorded spend of ${rupees(totalSpend)} as one month`
+    );
+  } else {
+    lines.push("- Emergency fund target: cannot be sized yet, no spending recorded");
+  }
+  if (totalIncome > 0) {
+    lines.push(
+      `- 20% of income (the common monthly savings benchmark): ${rupees(totalIncome * 0.2)}`,
+      `- Half of the surplus: ${rupees(surplus / 2)}; a quarter of it: ${rupees(surplus / 4)}`
+    );
+  } else {
+    lines.push("- Savings benchmark: cannot be sized yet, no income recorded");
+  }
+  lines.push(
+    "- The app records amounts without months. Treat these as a snapshot of what has been entered so far, not a verified monthly average.",
+    ""
+  );
+
+  lines.push("BUDGETS (name | limit | spent | remaining | used)");
   if (budgetList.length) {
     const ranked = [...budgetList].sort((a, b) => num(b.totalSpend) - num(a.totalSpend));
     for (const b of ranked) {
@@ -69,7 +101,7 @@ export function buildFinancialContext({
     lines.push("- none");
   }
 
-  lines.push("", `EXPENSES (name | amount | share of spend | date) — largest first`);
+  lines.push("", "EXPENSES (name | amount | share of spend | date), largest first");
   if (expensesList.length) {
     const ranked = [...expensesList].sort((a, b) => num(b.amount) - num(a.amount));
     for (const e of ranked.slice(0, MAX_EXPENSES)) {
